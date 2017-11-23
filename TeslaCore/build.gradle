@@ -1,0 +1,5 @@
+group 'com.mcsimonflash.sponge.teslacore'
+
+dependencies {
+    compile project(":TeslaLibs")
+}

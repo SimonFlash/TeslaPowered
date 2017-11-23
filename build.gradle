@@ -1,0 +1,51 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '1.2.3'
+}
+
+group 'com.mcsimonflash.sponge.teslapowered'
+ext {
+    teslapoweredversion = '1.0.0'
+    spongeapiversion = '7.0.0-SNAPSHOT'
+    completeversion = "-s${spongeapiversion.substring(0, 3)}-v${teslapoweredversion}"
+}
+
+allprojects {
+    apply plugin: 'java'
+
+    repositories {
+        mavenCentral()
+        maven {
+            name 'SpongeAPI'
+            url 'http://repo.spongepowered.org/maven'
+        }
+    }
+
+    dependencies {
+        compile "org.spongepowered:spongeapi:${spongeapiversion}"
+    }
+
+    jar {
+        archiveName = "${project.name}${completeversion}.jar"
+    }
+}
+
+dependencies {
+    compile project(":TeslaCore")
+    compile project(":TeslaLibs")
+}
+
+shadowJar {
+    dependencies {
+        include project(":TeslaCore")
+        include project(":TeslaLibs")
+    }
+    archiveName = "${project.name}${completeversion}.jar"
+}
+
+task copyJars(type: Copy) {
+    from([subprojects.jar, shadowJar])
+    into project.file("#releases/${teslapoweredversion}")
+}
+
+build.dependsOn(shadowJar, copyJars)
