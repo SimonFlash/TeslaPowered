@@ -5,7 +5,7 @@ plugins {
 
 group 'com.mcsimonflash.sponge.teslapowered'
 ext {
-    teslapoweredversion = '1.0.0'
+    teslapoweredversion = '1.0.1'
     spongeapiversion = '7.0.0-SNAPSHOT'
     completeversion = "-s${spongeapiversion.substring(0, 3)}-v${teslapoweredversion}"
 }
@@ -22,7 +22,7 @@ allprojects {
     }
 
     dependencies {
-        compile "org.spongepowered:spongeapi:${spongeapiversion}"
+        compileOnly "org.spongepowered:spongeapi:${spongeapiversion}"
     }
 
     jar {

@@ -2,13 +2,14 @@ package com.mcsimonflash.sponge.teslacore;
 
 import com.google.inject.Inject;
 import com.mcsimonflash.sponge.teslacore.tesla.Tesla;
+import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.text.Text;
 
 @Plugin(id = "teslacore",
         name = "TeslaCore",
-        version = "1.0.0",
+        version = "1.0.1",
+        dependencies = @Dependency(id = "teslalibs"),
         description = "Conductor of all things Tesla",
         authors = "Simon_Flash")
 public class TeslaCore extends Tesla {
