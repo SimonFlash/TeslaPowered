@@ -1,13 +1,1 @@
 group 'com.mcsimonflash.sponge.teslalibs'
-
-repositories {
-    jcenter()
-    maven {
-        name 'Sponge maven repo'
-        url 'http://repo.spongepowered.org/maven'
-    }
-}
-
-dependencies {
-    compile "org.spongepowered:spongeapi:${project.spongeapiversion}"
-}

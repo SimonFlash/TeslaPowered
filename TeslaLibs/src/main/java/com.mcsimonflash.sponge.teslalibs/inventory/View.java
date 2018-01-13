@@ -9,6 +9,7 @@ import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.property.InventoryTitle;
 import org.spongepowered.api.item.inventory.property.SlotIndex;
+import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
@@ -80,7 +81,7 @@ public class View implements Animatable<Layout> {
      * @param element the element
      */
     public void setSlot(int index, Element element) {
-        inventory.query(SlotIndex.of(index)).first().set(element.getItem().createStack());
+        inventory.query(QueryOperationTypes.INVENTORY_PROPERTY.of(SlotIndex.of(index))).first().set(element.getItem().createStack());
         slots.put(index, element);
     }
 

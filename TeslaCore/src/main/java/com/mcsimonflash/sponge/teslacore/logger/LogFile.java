@@ -12,6 +12,7 @@ import java.nio.file.Path;
 /**
  * A file for logging message.
  */
+@Deprecated
 public class LogFile {
 
     private final BufferedWriter writer;
