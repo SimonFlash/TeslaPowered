@@ -23,7 +23,7 @@ public class OrSourceParser<T extends User> extends DelegateParser<T, T> {
                 return (T) src;
             } catch (ClassCastException e1) {
                 String name = e1.getMessage().substring(e1.getMessage().lastIndexOf(46)+1, e1.getMessage().length() - 1).toLowerCase();
-                throw args.createError(getMessage("not-instance", "Expected an argument or the source to be a <name>.", "name", name));
+                throw args.createError(getMessage("not-instance", "Expected an argument or the source to be a " + name + "."));
             }
         }
     }

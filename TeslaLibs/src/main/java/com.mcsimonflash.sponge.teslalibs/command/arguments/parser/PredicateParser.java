@@ -9,7 +9,7 @@ import java.util.function.Predicate;
 
 public class PredicateParser<T> extends DelegateParser<T, T> {
 
-    protected final Predicate<T> predicate;
+    private final Predicate<T> predicate;
 
     public PredicateParser(Predicate<T> predicate, ValueParser<T> delegate, ImmutableMap<String, String> messages) {
         super(delegate, messages);

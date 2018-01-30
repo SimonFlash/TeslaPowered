@@ -6,6 +6,7 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.ArgumentParseException;
 import org.spongepowered.api.command.args.CommandArgs;
 import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.service.user.UserStorageService;
@@ -22,9 +23,9 @@ public class UserParser extends StandardParser<User> implements ValueParser.OrSo
     @Override
     public User parseValue(CommandSource src, CommandArgs args) throws ArgumentParseException {
         String arg = args.next();
-        User user = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(arg).orElseThrow(() ->
+        Player player = Sponge.getServer().getPlayer(arg).orElse(null);
+        return player != null ? player : Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(arg).orElseThrow(() ->
                 args.createError(getMessage("no-user","No user found with name <arg>.", "arg", arg)));
-        return user.getPlayer().map(User.class::cast).orElse(user);
     }
 
     @Override

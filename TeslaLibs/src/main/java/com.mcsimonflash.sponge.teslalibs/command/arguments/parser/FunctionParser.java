@@ -9,7 +9,7 @@ import java.util.function.Function;
 
 public class FunctionParser<T, R> extends DelegateParser<T, R> {
 
-    protected final Function<T, R> function;
+    private final Function<T, R> function;
 
     public FunctionParser(Function<T, R> function, ValueParser<T> delegate, ImmutableMap<String, String> unused) {
         super(delegate, unused);

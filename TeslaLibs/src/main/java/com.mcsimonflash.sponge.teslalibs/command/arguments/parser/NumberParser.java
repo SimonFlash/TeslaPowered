@@ -9,7 +9,7 @@ import java.util.function.Function;
 
 public class NumberParser<T extends Number & Comparable<T>> extends StandardParser<T> implements ValueParser.InRange<T> {
 
-    protected final Function<String, T> function;
+    private final Function<String, T> function;
 
     public NumberParser(Function<String, T> function, ImmutableMap<String, String> messages) {
         super(messages);

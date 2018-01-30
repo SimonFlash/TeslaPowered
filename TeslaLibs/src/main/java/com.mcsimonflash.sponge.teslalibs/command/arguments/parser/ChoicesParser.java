@@ -4,12 +4,14 @@ import com.google.common.collect.ImmutableMap;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.ArgumentParseException;
 import org.spongepowered.api.command.args.CommandArgs;
+import org.spongepowered.api.command.args.CommandContext;
 
+import java.util.List;
 import java.util.Map;
 
 public class ChoicesParser<T> extends StandardParser<T> {
 
-    protected final Map<String, T> choices;
+    private final Map<String, T> choices;
 
     public ChoicesParser(Map<String, T> choices, ImmutableMap<String, String> messages) {
         super(messages);
@@ -18,12 +20,17 @@ public class ChoicesParser<T> extends StandardParser<T> {
 
     @Override
     public T parseValue(CommandSource src, CommandArgs args) throws ArgumentParseException {
-        String key = args.next();
-        T value = choices.get(key.toLowerCase());
+        String arg = args.next();
+        T value = choices.get(arg.toLowerCase());
         if (value != null) {
             return value;
         }
-        throw args.createError(getMessage("no-choice", "No choice found for <key>.", "key", key));
+        throw args.createError(getMessage("no-choice", "No choice found for <arg>.", "arg", arg));
+    }
+
+    @Override
+    public List<String> complete(CommandSource src, CommandArgs args, CommandContext ctx) {
+        return complete(args, choices.keySet().stream());
     }
 
 }

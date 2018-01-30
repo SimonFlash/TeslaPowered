@@ -15,11 +15,11 @@ import org.spongepowered.api.world.Locatable;
 import java.util.List;
 import java.util.Optional;
 
-public class Vector3DParser extends StandardParser<Vector3d> {
+public class Vector3dParser extends StandardParser<Vector3d> {
 
     public static final ImmutableList<String> MODIFIERS = ImmutableList.of("#me", "#self", "#first", "#target");
 
-    public Vector3DParser(ImmutableMap<String, String> messages) {
+    public Vector3dParser(ImmutableMap<String, String> messages) {
         super(messages);
     }
 

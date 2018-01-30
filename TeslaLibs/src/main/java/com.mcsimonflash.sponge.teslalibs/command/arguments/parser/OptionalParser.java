@@ -7,7 +7,6 @@ import org.spongepowered.api.command.args.CommandArgs;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.text.Text;
 
-import javax.annotation.Nullable;
 import java.util.Optional;
 
 public class OptionalParser<T> extends DelegateParser<T, Optional<T>> {
@@ -17,7 +16,7 @@ public class OptionalParser<T> extends DelegateParser<T, Optional<T>> {
     }
 
     @Override
-    public void parse(@Nullable Text key, CommandSource src, CommandArgs args, CommandContext ctx) throws ArgumentParseException {
+    public void parse(Text key, CommandSource src, CommandArgs args, CommandContext ctx) throws ArgumentParseException {
         parseValue(src, args).ifPresent(v -> ctx.putArg(key, v));
     }
 

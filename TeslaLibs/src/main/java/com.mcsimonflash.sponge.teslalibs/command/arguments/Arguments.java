@@ -1,13 +1,14 @@
 package com.mcsimonflash.sponge.teslalibs.command.arguments;
 
+import com.flowpowered.math.vector.Vector3d;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Range;
 import com.mcsimonflash.sponge.teslalibs.command.arguments.parser.*;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.util.Tristate;
+import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.extent.Extent;
 
 import java.util.Map;
 import java.util.function.Function;
@@ -26,29 +27,20 @@ public class Arguments {
             .put("undefined", Tristate.UNDEFINED).put("u", Tristate.UNDEFINED).put("1/2", Tristate.UNDEFINED)
             .build();
 
-    private static final ValueParser<String> STRING = (src, args) -> args.next();
-
-    private static final ValueParser<String> REMAINING_STRINGS = (src, args) -> args.getRaw().substring(args.getRawPosition());
-
+    private static final ValueParser<String> STRING = string(false, ImmutableMap.of());
+    private static final ValueParser<String> REMAINING_STRINGS = string(true, ImmutableMap.of());
     private static final NumberParser<Integer> INTEGER = number(Integer::decode, ImmutableMap.of("invalid-format", "Expected <arg> to be an integer."));
-
     private static final NumberParser<Long> LONG = number(Long::decode, ImmutableMap.of("invalid-format", "Expected <arg> to be a long (integer)."));
-
     private static final NumberParser<Float> FLOAT = number(Float::valueOf, ImmutableMap.of("invalid-format", "Expected <arg> to be a float (decimal)."));
-
     private static final NumberParser<Double> DOUBLE = number(Double::valueOf, ImmutableMap.of("invalid-format", "Expected <arg> to be a double (decimal)."));
-
-    private static final PlayerParser PLAYER = player(ImmutableMap.of());
-
-    private static final UserParser USER = user(ImmutableMap.of());
-
     private static final ChoicesParser<Boolean> BOOLEAN = choices(BOOLEANS, ImmutableMap.of("no-choice", "Expected <key> to be a boolean (true/false)."));
-
     private static final ChoicesParser<Tristate> TRISTATE = choices(TRISTATES, ImmutableMap.of("no-choice", "Expected <key> to be a tristate (true/false/undefined)."));
-
+    private static final PlayerParser PLAYER = player(ImmutableMap.of());
+    private static final UserParser USER = user(ImmutableMap.of());
     private static final WorldParser WORLD = world(ImmutableMap.of());
-
-    private static final Vector3DParser VECTOR_3D = vector3d(ImmutableMap.of());
+    private static final Vector3dParser VECTOR_3D = vector3d(ImmutableMap.of());
+    private static final LocationParser LOCATION = location(WORLD, VECTOR_3D, ImmutableMap.of());
+    private static final DurationParser DURATION = duration(ImmutableMap.of());
 
     public static ValueParser<String> string() {
         return STRING;
@@ -94,12 +86,28 @@ public class Arguments {
         return WORLD;
     }
 
-    public static Vector3DParser vector3d() {
+    public static Vector3dParser vector3d() {
         return VECTOR_3D;
+    }
+
+    public static LocationParser location() {
+        return LOCATION;
+    }
+
+    public static DurationParser duration() {
+        return DURATION;
+    }
+
+    public static StringParser string(boolean remaining, ImmutableMap<String, String> unused) {
+        return new StringParser(remaining, unused);
     }
 
     public static <T extends Number & Comparable<T>> NumberParser<T> number(Function<String, T> function, ImmutableMap<String, String> messages) {
         return new NumberParser<>(function, messages);
+    }
+
+    public static DurationParser duration(ImmutableMap<String, String> messages) {
+        return new DurationParser(messages);
     }
 
     public static <T> ChoicesParser<T> choices(Map<String, T> choices, ImmutableMap<String, String> messages) {
@@ -122,8 +130,12 @@ public class Arguments {
         return new WorldParser(messages);
     }
 
-    public static Vector3DParser vector3d(ImmutableMap<String, String> messages) {
-        return new Vector3DParser(messages);
+    public static Vector3dParser vector3d(ImmutableMap<String, String> messages) {
+        return new Vector3dParser(messages);
+    }
+
+    public static <T extends Extent> LocationParser<T> location(ValueParser<T> extent, ValueParser<Vector3d> vector3d, ImmutableMap<String, String> unused) {
+        return new LocationParser<>(extent, vector3d, unused);
     }
 
     public static <T> PredicateParser<T> predicate(Predicate<T> predicate, ValueParser<T> delegate, ImmutableMap<String, String> messages) {
@@ -136,6 +148,10 @@ public class Arguments {
 
     public static <T> OptionalParser<T> optional(ValueParser<T> delegate, ImmutableMap<String, String> unused) {
         return new OptionalParser<>(delegate, unused);
+    }
+
+    public static SequenceElement sequence(CommandElement... elements) {
+        return new SequenceElement(ImmutableList.copyOf(elements));
     }
 
     public static FlagsElement.Builder flags() {

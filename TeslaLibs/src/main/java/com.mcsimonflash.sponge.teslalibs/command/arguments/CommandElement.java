@@ -11,7 +11,7 @@ import java.util.List;
 
 public class CommandElement<T> extends org.spongepowered.api.command.args.CommandElement implements ValueParser<T> {
 
-    private final ValueParser<T> parser;
+    protected final ValueParser<T> parser;
 
     public CommandElement(Text key, ValueParser<T> parser) {
         super(key);

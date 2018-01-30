@@ -1,7 +1,7 @@
 package com.mcsimonflash.sponge.teslalibs.command.arguments.parser;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
 import com.mcsimonflash.sponge.teslalibs.command.arguments.Arguments;
 import com.mcsimonflash.sponge.teslalibs.command.arguments.CommandElement;
@@ -28,7 +28,7 @@ public interface ValueParser<T> {
     }
 
     default List<String> complete(CommandSource src, CommandArgs args, CommandContext ctx) {
-        return Lists.newArrayList();
+        return ImmutableList.of();
     }
 
     default <R> FunctionParser<T, R> map(Function<T, R> mapper) {
