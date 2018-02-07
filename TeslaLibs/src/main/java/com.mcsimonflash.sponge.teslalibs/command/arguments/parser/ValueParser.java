@@ -21,58 +21,59 @@ import java.util.function.Predicate;
 @FunctionalInterface
 public interface ValueParser<T> {
 
+    /**
+     * Parses a value from this parser. This is a {@link FunctionalInterface}
+     * and may be defined in lambda expressions.
+     */
     T parseValue(CommandSource src, CommandArgs args) throws ArgumentParseException;
 
+    /**
+     * Parses a value from this parser and adds it into the context under the
+     * given key.
+     */
     default void parse(Text key, CommandSource src, CommandArgs args, CommandContext ctx) throws ArgumentParseException {
         ctx.putArg(key, parseValue(src, args));
     }
 
+    /**
+     * Completes this parser for the given values.
+     */
     default List<String> complete(CommandSource src, CommandArgs args, CommandContext ctx) {
         return ImmutableList.of();
     }
 
+    /**
+     * Creates a new {@link FunctionParser} with the given mapper.
+     *
+     * @see Arguments#function(Function, ValueParser, ImmutableMap)
+     */
     default <R> FunctionParser<T, R> map(Function<T, R> mapper) {
         return Arguments.function(mapper, this, ImmutableMap.of());
     }
 
+    /**
+     * Creates a new {@link PredicateParser} with the given predicate.
+     *
+     * @see Arguments#predicate(Predicate, ValueParser, ImmutableMap)
+     */
     default PredicateParser<T> filter(Predicate<T> predicate) {
         return Arguments.predicate(predicate, this, ImmutableMap.of());
     }
 
+    /**
+     * Creates a new {@link OptionalParser} with this parser.
+     *
+     * @see Arguments#optional(ValueParser, ImmutableMap)
+     */
     default OptionalParser<T> optional() {
         return Arguments.optional(this, ImmutableMap.of());
     }
 
-    interface InRange<T extends Comparable> extends ValueParser<T> {
-
-        default PredicateParser<T> inRange(Range<T> range) {
-            return Arguments.predicate(range, this, ImmutableMap.of("fail-test", "Value <value> must be within range " + range + "."));
-        }
-
-    }
-
-    interface OrSource<T extends User> extends ValueParser<T> {
-
-        default OrSourceParser<T> orSource() {
-            return Arguments.orSource(this, ImmutableMap.of());
-        }
-
-    }
-
-    interface ToUuid<T extends Identifiable> extends ValueParser<T> {
-
-        default FunctionParser<T, UUID> toUuid() {
-            return map(Identifiable::getUniqueId);
-        }
-
-    }
-
+    /**
+     * Creates a new {@link CommandElement} with the given key.
+     */
     default CommandElement<T> toElement(String key) {
-        return toElement(Text.of(key));
-    }
-
-    default CommandElement<T> toElement(Text key) {
-        return new CommandElement<>(key, this);
+        return new CommandElement<>(Text.of(key), this);
     }
 
 }

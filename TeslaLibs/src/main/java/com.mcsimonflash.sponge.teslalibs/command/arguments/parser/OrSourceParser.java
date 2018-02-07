@@ -4,12 +4,16 @@ import com.google.common.collect.ImmutableMap;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.ArgumentParseException;
 import org.spongepowered.api.command.args.CommandArgs;
-import org.spongepowered.api.entity.living.player.User;
 
-public class OrSourceParser<T extends User> extends DelegateParser<T, T> {
+import java.util.function.Function;
 
-    public OrSourceParser(ValueParser<T> delegate, ImmutableMap<String, String> messages) {
+public class OrSourceParser<T> extends DelegateParser<T, T> {
+
+    protected final Function<CommandSource, T> function;
+
+    public OrSourceParser(Function<CommandSource, T> function, ValueParser<T> delegate, ImmutableMap<String, String> messages) {
         super(delegate, messages);
+        this.function = function;
     }
 
     @Override
@@ -20,10 +24,9 @@ public class OrSourceParser<T extends User> extends DelegateParser<T, T> {
         } catch (ArgumentParseException e) {
             args.setState(state);
             try {
-                return (T) src;
-            } catch (ClassCastException e1) {
-                String name = e1.getMessage().substring(e1.getMessage().lastIndexOf(46)+1, e1.getMessage().length() - 1).toLowerCase();
-                throw args.createError(getMessage("not-instance", "Expected an argument or the source to be a " + name + "."));
+                return function.apply(src);
+            } catch (IllegalArgumentException ex) {
+                throw args.createError(getMessage("exception", ex.getMessage()));
             }
         }
     }

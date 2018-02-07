@@ -15,8 +15,8 @@ public class StringParser extends StandardParser<String> {
 
     private final boolean remaining;
 
-    public StringParser(boolean remaining, ImmutableMap<String, String> messages) {
-        super(messages);
+    public StringParser(boolean remaining, ImmutableMap<String, String> unused) {
+        super(unused);
         this.remaining = remaining;
     }
 

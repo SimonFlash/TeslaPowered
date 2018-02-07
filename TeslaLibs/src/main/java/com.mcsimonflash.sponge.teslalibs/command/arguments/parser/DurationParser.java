@@ -10,8 +10,8 @@ import java.util.regex.Pattern;
 
 public class DurationParser extends StandardParser<Long> {
 
+    public static final Pattern PATTERN = Pattern.compile("(?:([0-9]+)w)?(?:([0-9]+)d)?(?:([0-9]+)h)?(?:([0-9]+)m)?(?:([0-9]+)s)?(?:([0-9]+)ms)?");
     private static final long[] CONVERSIONS = {604800000, 86400000, 3600000, 60000, 1000, 1};
-    private static final Pattern PATTERN = Pattern.compile("(?:([0-9]+)w)?(?:([0-9]+)d)?(?:([0-9]+)h)?(?:([0-9]+)m)?(?:([0-9]+)s)?(?:([0-9]+)ms)?");
 
     public DurationParser(ImmutableMap<String, String> messages) {
         super(messages);
@@ -31,7 +31,7 @@ public class DurationParser extends StandardParser<Long> {
                 }
                 return time;
             }
-            throw args.createError(getMessage("invalid-format", "<arg> does not match the format of a duration.", "arg", arg));
+            throw args.createError(getMessage("invalid-format", "Input <arg> does not match the format of a duration.", "arg", arg));
         }
     }
 

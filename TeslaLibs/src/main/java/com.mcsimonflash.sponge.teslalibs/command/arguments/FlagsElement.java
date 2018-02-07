@@ -60,7 +60,7 @@ public class FlagsElement extends CommandElement {
             while (args.hasNext() && args.peek().startsWith("-")) {
                 String[] split = args.next().split("=", 2);
                 CommandElement element = aliases.get(split[0].toLowerCase());
-                if (element == null) {
+                if (element == null || split.length == 1 && !args.hasNext()) {
                     return unused.stream().flatMap(Collection::stream).map(s -> "-" + s).filter(s -> s.toLowerCase().startsWith(split[0].toLowerCase())).collect(Collectors.toList());
                 }
                 Object state = args.getState();
@@ -69,7 +69,7 @@ public class FlagsElement extends CommandElement {
                     unused.removeIf(l -> l.contains(split[0].substring(1).toLowerCase()));
                 } catch (ArgumentParseException e) {
                     args.setState(state);
-                    String start = split.length == 2 ? split[0] + "=" : args.hasNext() ? "" : split[0] + " ";
+                    String start = split.length == 2 ? split[0] + "=" : "";
                     return element.complete(src, args, ctx).stream().map(s -> start + s).collect(Collectors.toList());
                 }
             }
@@ -104,15 +104,27 @@ public class FlagsElement extends CommandElement {
 
         private Map<List<String>, CommandElement> flags = Maps.newHashMap();
 
+        /**
+         * Adds a new flag with the given element and list of flags. The value
+         * parsed is added into the context based on the key of the element, not
+         * any of the flag aliases.
+         */
         public Builder flag(CommandElement element, String... flags) {
             this.flags.put(Arrays.stream(flags).map(String::toLowerCase).collect(Collectors.toList()), element);
             return this;
         }
 
+        /**
+         * Adds a new flag with an element that returns true and list of flags.
+         * If defined, 'true' is added to the context under the first flag.
+         */
         public Builder flag(String... flags) {
             return flags.length != 0 ? flag(TRUE.toElement(flags[0]), flags) : this;
         }
 
+        /**
+         * Creates a new {@link FlagsElement} from this builder.
+         */
         public FlagsElement build() {
             return new FlagsElement(flags);
         }

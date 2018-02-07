@@ -3,11 +3,13 @@ package com.mcsimonflash.sponge.teslalibs.command.arguments.parser;
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.mcsimonflash.sponge.teslalibs.command.arguments.Arguments;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.ArgumentParseException;
 import org.spongepowered.api.command.args.CommandArgs;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.util.blockray.BlockRay;
 import org.spongepowered.api.util.blockray.BlockRayHit;
 import org.spongepowered.api.world.Locatable;
@@ -44,7 +46,7 @@ public class Vector3dParser extends StandardParser<Vector3d> {
                     }
                     throw args.createError(getMessage("not-entity","The use of ", arg, " requires the source to be an entity."));
             }
-            throw args.createError(getMessage("unknown-modifier","No known modifier with the name <arg>.", "arg", arg));
+            throw args.createError(getMessage("invalid-modifier","No known modifier with the name <arg>.", "arg", arg));
         }
         Optional<Vector3d> source = src instanceof Locatable ? Optional.of(((Locatable) src).getLocation().getPosition()) : Optional.empty();
         if (arg.contains(",")) {
@@ -69,13 +71,21 @@ public class Vector3dParser extends StandardParser<Vector3d> {
             }
             return Double.parseDouble(arg);
         } catch (NumberFormatException e) {
-            throw args.createError(getMessage("not-a-number","The argument <arg> is not a number: <exception>", "arg", arg, "exception", e.getMessage()));
+            throw args.createError(getMessage("invalid-number","The argument <arg> is not a number: <exception>", "arg", arg, "exception", e.getMessage()));
         }
     }
 
     @Override
     public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
         return complete(args, MODIFIERS.stream());
+    }
+
+    /**
+     * Creates a new {@link OrSourceParser} that returns the position of their
+     * location if the source is a player.
+     */
+    public OrSourceParser<Vector3d> orSource() {
+        return Arguments.orSource(s -> ((Player) s).getLocation().getPosition(), this, ImmutableMap.of("exception", "Unable to parse vector3d and source is not a Player."));
     }
 
 }

@@ -22,7 +22,7 @@ public class PredicateParser<T> extends DelegateParser<T, T> {
         if (predicate.test(value)) {
             return value;
         }
-        throw args.createError(getMessage("fail-test", "The value <value> does not meet the requirements for this argument.", "value", value));
+        throw args.createError(getMessage("invalid-value", "The value <value> does not meet the requirements for this argument.", "value", value));
     }
 
 }
