@@ -1,5 +1,6 @@
 package com.mcsimonflash.sponge.teslalibs.command.arguments.parser;
 
+import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Range;
@@ -16,7 +17,6 @@ import org.spongepowered.api.util.Identifiable;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 @FunctionalInterface
 public interface ValueParser<T> {

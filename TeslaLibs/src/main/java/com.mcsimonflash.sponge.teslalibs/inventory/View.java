@@ -3,13 +3,14 @@ package com.mcsimonflash.sponge.teslalibs.inventory;
 import com.google.common.collect.Maps;
 import com.mcsimonflash.sponge.teslalibs.animation.Animatable;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.property.InventoryTitle;
 import org.spongepowered.api.item.inventory.property.SlotIndex;
-import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
+import org.spongepowered.api.item.inventory.type.OrderedInventory;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
@@ -81,8 +82,11 @@ public class View implements Animatable<Layout> {
      * @param element the element
      */
     public void setSlot(int index, Element element) {
-        inventory.query(QueryOperationTypes.INVENTORY_PROPERTY.of(SlotIndex.of(index))).first().set(element.getItem().createStack());
-        slots.put(index, element);
+        inventory.<OrderedInventory>query(OrderedInventory.class).getSlot(SlotIndex.of(index)).ifPresent(s -> {
+            slots.put(index, element);
+            s.set(element.getItem().createStack());
+            slots.put(index, element);
+        });
     }
 
     /**
@@ -101,7 +105,7 @@ public class View implements Animatable<Layout> {
      * @param player the player
      */
     public void open(Player player) {
-        Task.builder().execute(t -> player.openInventory(inventory)).submit(container);
+        Task.builder().execute(t -> player.openInventory(inventory, Cause.source(container).build())).submit(container);
     }
 
     /**
@@ -113,7 +117,7 @@ public class View implements Animatable<Layout> {
     public void close(Player player) {
         boolean closeable = this.closeable;
         this.closeable = true;
-        player.closeInventory();
+        player.closeInventory(Cause.source(container).build());
         this.closeable = closeable;
     }
 

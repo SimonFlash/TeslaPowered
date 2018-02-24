@@ -9,6 +9,9 @@ import org.spongepowered.api.text.Text;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toList;
+
 public abstract class StandardParser<T> implements ValueParser<T> {
 
     protected final ImmutableMap<String, String> messages;
@@ -22,7 +25,7 @@ public abstract class StandardParser<T> implements ValueParser<T> {
     }
 
     public final List<String> complete(CommandArgs args, Stream<String> stream) {
-        return args.nextIfPresent().map(String::toLowerCase).map(a -> stream.filter(s -> s.toLowerCase().startsWith(a))).orElse(stream).collect(ImmutableList.toImmutableList());
+        return args.nextIfPresent().map(String::toLowerCase).map(a -> stream.filter(s -> s.toLowerCase().startsWith(a))).orElse(stream).collect(collectingAndThen(toList(), ImmutableList::copyOf));
     }
 
 }
