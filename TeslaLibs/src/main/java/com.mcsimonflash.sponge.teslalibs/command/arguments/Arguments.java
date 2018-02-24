@@ -1,6 +1,7 @@
 package com.mcsimonflash.sponge.teslalibs.command.arguments;
 
 import com.flowpowered.math.vector.Vector3d;
+import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.mcsimonflash.sponge.teslalibs.command.arguments.parser.*;
@@ -14,7 +15,6 @@ import org.spongepowered.api.world.World;
 
 import java.util.Map;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 public class Arguments {
 

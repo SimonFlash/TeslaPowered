@@ -1,6 +1,7 @@
 package com.mcsimonflash.sponge.teslalibs.inventory;
 
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
@@ -24,7 +25,7 @@ import java.util.function.Consumer;
  */
 public class Element {
 
-    public static final Element EMPTY = of(ItemStack.empty());
+    public static final Element EMPTY = of(ItemStack.of(ItemTypes.NONE, 1));
 
     private final ItemStackSnapshot item;
     private final Consumer<Player> consumer;

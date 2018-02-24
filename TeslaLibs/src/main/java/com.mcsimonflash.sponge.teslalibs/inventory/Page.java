@@ -14,11 +14,11 @@ import java.util.List;
 
 public class Page {
 
-    public static final Element FIRST = Element.of(ItemStack.empty());
-    public static final Element LAST = Element.of(ItemStack.empty());
-    public static final Element NEXT = Element.of(ItemStack.empty());
-    public static final Element PREVIOUS = Element.of(ItemStack.empty());
-    public static final Element CURRENT = Element.of(ItemStack.empty());
+    public static final Element FIRST = Element.of(ItemStack.of(ItemTypes.NONE, 1));
+    public static final Element LAST = Element.of(ItemStack.of(ItemTypes.NONE, 1));
+    public static final Element NEXT = Element.of(ItemStack.of(ItemTypes.NONE, 1));
+    public static final Element PREVIOUS = Element.of(ItemStack.of(ItemTypes.NONE, 1));
+    public static final Element CURRENT = Element.of(ItemStack.of(ItemTypes.NONE, 1));
 
     private LinkedList<View> views = Lists.newLinkedList();
     private Layout template;

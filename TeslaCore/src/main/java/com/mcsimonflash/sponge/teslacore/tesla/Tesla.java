@@ -8,6 +8,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.common.SpongeImpl;
 
 import java.io.IOException;
 import java.net.URL;
@@ -39,13 +40,16 @@ public abstract class Tesla {
         Version = Container.getVersion().orElse("undefined");
         Description = Container.getDescription().orElse("undefined");
         URL = TeslaUtils.parseURL(Container.getUrl().orElse("https://en.wikipedia.org/wiki/Nikola_Tesla"));
-        Directory = Sponge.getConfigManager().getPluginConfig(Container).getDirectory();
+        Directory = SpongeImpl.getPluginConfigDir().resolve(Id);
         Logger = new LoggerService(Container.getLogger());
         MessageService ms;
         try {
             Path translations = Directory.resolve("translations");
             Files.createDirectories(translations);
-            Container.getAsset("messages.properties").get().copyToFile(translations.resolve("messages.properties"), false, true);
+            Path messages = translations.resolve("messages.properties");
+            if(Files.notExists(messages)) {
+                Container.getAsset("messages.properties").get().copyToFile(messages);
+            }
             ms = MessageService.of(translations, "messages");
         } catch (IOException e) {
             Logger.error("An error occurred initializing message translations. Using internal copies.");
