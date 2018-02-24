@@ -1,8 +1,8 @@
 package com.mcsimonflash.sponge.teslalibs.command;
 
 import com.google.common.collect.ImmutableList;
+import com.mcsimonflash.sponge.teslalibs.command.arguments.Arguments;
 import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.text.Text;
@@ -26,7 +26,7 @@ public abstract class Command implements CommandExecutor {
         description = settings.description != null ? Optional.of(settings.description) : getClass().isAnnotationPresent(Description.class) ? Optional.of(Text.of(getClass().getAnnotation(Description.class).value())) : Optional.empty();
         CommandSpec.Builder builder = CommandSpec.builder().executor(this);
         if (!arguments.isEmpty()) {
-            builder.arguments(arguments.size() == 1 ? arguments.get(0) : GenericArguments.seq(settings.arguments));
+            builder.arguments(arguments.size() == 1 ? arguments.get(0) : Arguments.sequence(settings.arguments));
         }
         for (Class<? extends Command> child : children) {
             Command command = service.getInstance(child);

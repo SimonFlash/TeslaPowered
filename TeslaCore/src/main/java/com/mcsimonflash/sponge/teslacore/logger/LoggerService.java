@@ -23,6 +23,7 @@ import java.nio.file.Path;
  * A logging service that wraps the {@link org.slf4j.Logger}. This logger can
  * save message to an external log file and enable/disable a debugFile mode.
  */
+@Deprecated
 public class LoggerService {
 
     private Logger logger;

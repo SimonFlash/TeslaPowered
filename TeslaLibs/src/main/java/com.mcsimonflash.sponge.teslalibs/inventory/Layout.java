@@ -7,6 +7,9 @@ import com.google.common.collect.Maps;
 import java.util.Collection;
 import java.util.Map;
 
+/* TODO:
+ * Layouts will be required to have an InventoryDimension
+ */
 public class Layout {
 
     private final ImmutableMap<Integer, Element> elements;

@@ -44,15 +44,16 @@ public class Page {
     }
 
     /**
-     * Defines this page to contain the given elements.
+     * Defines this page to contain the given elements. The implementation
+     * currently assumes that the layout contains 54 slots (double chest); this
+     * will be changed in a future version.
      *
      * @param elements the list of elements
      * @return this page
      */
     public Page define(List<Element> elements) {
         views.clear();
-        int size = 54 - template.getElements().size();
-        int pages = (elements.size() - 1) / size + 1;
+        int pages = elements.size() != 0 ? elements.size() / (54 - template.getElements().size()) : 1;
         for (int i = 1; i <= pages; i++) {
             views.add(View.of(InventoryArchetypes.DOUBLE_CHEST, container));
         }
@@ -64,7 +65,7 @@ public class Page {
                     .replace(NEXT, Element.of(ItemStack.builder().itemType(i == pages ? ItemTypes.MAP : ItemTypes.PAPER).quantity(i == pages ? i : i + 1).add(Keys.DISPLAY_NAME, Text.of("Next")).build(), i == pages ? p -> {} : views.get(i)::open))
                     .replace(PREVIOUS, Element.of(ItemStack.builder().itemType(i == 1 ? ItemTypes.MAP : ItemTypes.PAPER).quantity(i == 1 ? i : i - 1).add(Keys.DISPLAY_NAME, Text.of("Previous")).build(), i == 1 ? p -> {} : views.get(i - 2)::open))
                     .replace(CURRENT, Element.of(ItemStack.builder().itemType(ItemTypes.MAP).quantity(i).add(Keys.DISPLAY_NAME, Text.of("Current")).build()))
-                    .page(elements.subList((i - 1) * size, i == pages ? elements.size() : (i) * size))
+                    .page(elements.subList((i - 1) * (54 - template.getElements().size()), i == pages ? elements.size() : (i) * (54 - template.getElements().size())))
                     .build());
         }
         return this;

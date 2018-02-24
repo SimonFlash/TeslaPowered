@@ -47,7 +47,7 @@ public abstract class Tesla {
             Path translations = Directory.resolve("translations");
             Files.createDirectories(translations);
             Path messages = translations.resolve("messages.properties");
-            if (Files.notExists(messages)) {
+            if(Files.notExists(messages)) {
                 Container.getAsset("messages.properties").get().copyToFile(messages);
             }
             ms = MessageService.of(translations, "messages");
