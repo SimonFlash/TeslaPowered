@@ -83,7 +83,6 @@ public class View implements Animatable<Layout> {
      */
     public void setSlot(int index, Element element) {
         inventory.<OrderedInventory>query(OrderedInventory.class).getSlot(SlotIndex.of(index)).ifPresent(s -> {
-            slots.put(index, element);
             s.set(element.getItem().createStack());
             slots.put(index, element);
         });
