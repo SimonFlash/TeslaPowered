@@ -1,0 +1,6 @@
+\#releases
+.idea
+out
+build
+.gradle
+*.iml

@@ -1,8 +1,7 @@
 package com.mcsimonflash.sponge.teslalibs.message;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
@@ -21,12 +20,8 @@ public class MessageService {
      * @see #of(Path, String)
      */
     private MessageService(ClassLoader loader, String name) {
-        cache = CacheBuilder.newBuilder().build(new CacheLoader<Locale, ResourceBundle>() {
-            @Override
-            public ResourceBundle load(Locale key) throws Exception {
-                return ResourceBundle.getBundle(name, key, loader);
-            }
-        });
+        cache = Caffeine.newBuilder().build(key -> ResourceBundle.getBundle(name, key, loader));
+        cache.invalidateAll();
     }
 
     /**
@@ -60,8 +55,15 @@ public class MessageService {
      * @return a new Formatter for the message
      */
     public Formatter get(String key, Locale locale) {
-        ResourceBundle bundle = cache.getUnchecked(locale);
-        return new Formatter(bundle.containsKey(key) ? bundle.getString(key) : key);
+        ResourceBundle bundle = cache.get(locale);
+        return new Formatter(bundle != null && bundle.containsKey(key) ? bundle.getString(key) : key);
+    }
+
+    /**
+     * Reloads the MessageService, invalidating any cached ResourceBundles.
+     */
+    public void reload() {
+        cache.invalidateAll();
     }
 
     public static class Formatter {

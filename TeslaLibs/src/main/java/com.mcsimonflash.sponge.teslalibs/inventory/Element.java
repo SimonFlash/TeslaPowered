@@ -24,7 +24,7 @@ import java.util.function.Consumer;
  */
 public class Element {
 
-    public static final Element EMPTY = Element.of(ItemStack.empty(), player -> {});
+    public static final Element EMPTY = of(ItemStack.empty());
 
     private final ItemStackSnapshot item;
     private final Consumer<Player> consumer;

@@ -1,5 +1,5 @@
 plugins {
-    id 'java'
+    id 'org.spongepowered.plugin' version '0.8.1'
     id 'com.github.johnrengelman.shadow' version '1.2.3'
 }
 
@@ -12,14 +12,7 @@ ext {
 
 allprojects {
     apply plugin: 'java'
-
-    repositories {
-        mavenCentral()
-        maven {
-            name 'SpongeAPI'
-            url 'http://repo.spongepowered.org/maven'
-        }
-    }
+    apply plugin: 'org.spongepowered.plugin'
 
     dependencies {
         compileOnly "org.spongepowered:spongeapi:${spongeapiversion}"
@@ -40,6 +33,7 @@ shadowJar {
         include project(":TeslaCore")
         include project(":TeslaLibs")
     }
+
     archiveName = "${project.name}${completeversion}.jar"
 }
 
