@@ -49,7 +49,7 @@ public abstract class Tesla {
             ms = MessageService.of(translations, "messages");
         } catch (IOException e) {
             Logger.error("An error occurred initializing message translations. Using internal copies.");
-            ms = MessageService.of(getClass().getClassLoader(), "assets/" + Id + "/messages");
+            ms = MessageService.of(container, "messages");
         }
         Messages = ms;
         Prefix = Text.of(TextColors.DARK_GRAY, "[", TextColors.YELLOW, "Tesla", TextColors.GOLD, Name.substring(5), TextColors.DARK_GRAY, "]", TextColors.GRAY, " ");

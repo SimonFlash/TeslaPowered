@@ -2,7 +2,7 @@ package com.mcsimonflash.sponge.teslalibs.command.arguments.parser;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.mcsimonflash.sponge.teslalibs.message.MessageService;
+import com.mcsimonflash.sponge.teslalibs.message.Message;
 import org.spongepowered.api.command.args.CommandArgs;
 import org.spongepowered.api.text.Text;
 
@@ -18,7 +18,7 @@ public abstract class StandardParser<T> implements ValueParser<T> {
     }
 
     public Text getMessage(String key, String def, Object... args) {
-        return new MessageService.Formatter(messages.getOrDefault(key, def)).args(args).toText();
+        return Message.of(messages.getOrDefault(key, def)).args(args).toText();
     }
 
     public final List<String> complete(CommandArgs args, Stream<String> stream) {
