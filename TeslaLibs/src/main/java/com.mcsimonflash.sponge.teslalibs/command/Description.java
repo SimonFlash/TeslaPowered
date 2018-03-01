@@ -9,6 +9,12 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Description {
 
+    /**
+     * The description of the command. This value is deserialized into a
+     * {@link org.spongepowered.api.text.Text} using the legacy (&) format.
+     *
+     * @see Command.Settings#description(org.spongepowered.api.text.Text)
+     */
     String value();
 
 }

@@ -9,6 +9,11 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Aliases {
 
+    /**
+     * The aliases for the command.
+     *
+     * @see Command.Settings#aliases(String...)
+     */
     String[] value();
 
 }

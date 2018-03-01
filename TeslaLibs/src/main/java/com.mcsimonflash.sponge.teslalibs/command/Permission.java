@@ -9,6 +9,11 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Permission {
 
+    /**
+     * The permission required for the command.
+     *
+     * @see Command.Settings#permission(String)
+     */
     String value();
 
 }

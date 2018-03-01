@@ -9,6 +9,11 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Children {
 
+    /**
+     * The child command classes for the command.
+     *
+     * @see Command.Settings#children(Class[])
+     */
     Class<? extends Command>[] value();
 
 }
