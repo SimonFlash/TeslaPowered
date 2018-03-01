@@ -1,4 +1,4 @@
-package com.mcsimonflash.sponge.teslalibs.command.arguments;
+package com.mcsimonflash.sponge.teslalibs.argument;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;

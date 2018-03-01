@@ -1,7 +1,7 @@
-package com.mcsimonflash.sponge.teslalibs.command.arguments.parser;
+package com.mcsimonflash.sponge.teslalibs.argument.parser;
 
 import com.google.common.collect.ImmutableMap;
-import com.mcsimonflash.sponge.teslalibs.command.arguments.Arguments;
+import com.mcsimonflash.sponge.teslalibs.argument.Arguments;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.ArgumentParseException;
@@ -38,14 +38,14 @@ public class UserParser extends StandardParser<User> {
 
     /**
      * Creates a new {@link OrSourceParser} that returns the source if they are
-     * a user.
+     * a {@link User}.
      */
     public OrSourceParser<User> orSource() {
         return Arguments.orSource(User.class::cast, this, ImmutableMap.of("exception", "Unable to parse user and source is not a User."));
     }
 
     /**
-     * Creates a new {@link ValueParser} that maps this player to their uuid.
+     * Creates a new {@link ValueParser} that maps this user to their uuid.
      */
     public ValueParser<UUID> toUuid() {
         return map(Identifiable::getUniqueId);

@@ -1,9 +1,9 @@
-package com.mcsimonflash.sponge.teslalibs.command.arguments;
+package com.mcsimonflash.sponge.teslalibs.argument;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.mcsimonflash.sponge.teslalibs.command.arguments.parser.*;
+import com.mcsimonflash.sponge.teslalibs.argument.parser.*;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.entity.living.player.Player;
@@ -37,12 +37,12 @@ public class Arguments {
     private static final ChoicesParser<Boolean> BOOLEAN = choices(BOOLEANS, ImmutableMap.of("no-choice", "Expected <key> to be a boolean (true/false)."));
     private static final ChoicesParser<Tristate> TRISTATE = choices(TRISTATES, ImmutableMap.of("no-choice", "Expected <key> to be a tristate (true/false/undefined)."));
     private static final PlayerParser PLAYER = player(ImmutableMap.of());
-    private static final OrSourceParser<Player> PLAYER_OR_SOURCE = PLAYER.orSource();
     private static final UserParser USER = user(ImmutableMap.of());
-    private static final OrSourceParser<User> USER_OR_SOURCE = USER.orSource();
     private static final WorldParser WORLD = world(ImmutableMap.of());
-    private static final Vector3dParser VECTOR_3D = vector3d(ImmutableMap.of());
-    private static final LocationParser LOCATION = location(WORLD, VECTOR_3D, ImmutableMap.of());
+    private static final PositionParser POSITION = position(ImmutableMap.of());
+    private static final LocationParser LOCATION = location(WORLD.orSource(), POSITION, ImmutableMap.of());
+    private static final CommandParser COMMAND = command(ImmutableMap.of());
+    private static final DateParser DATE = date(ImmutableMap.of());
     private static final DurationParser DURATION = duration(ImmutableMap.of());
 
     /**
@@ -116,24 +116,10 @@ public class Arguments {
     }
 
     /**
-     * Parses an {@link Player} or the source if of the type {@link Player}.
-     */
-    public static OrSourceParser<Player> playerOrSource() {
-        return PLAYER_OR_SOURCE;
-    }
-
-    /**
      * Parses an {@link User} Selectors are currently not supported.
      */
     public static UserParser user() {
         return USER;
-    }
-
-    /**
-     * Parses an {@link User} or the source if of the type {@link User}.
-     */
-    public static OrSourceParser<User> userOrSource() {
-        return USER_OR_SOURCE;
     }
 
     /**
@@ -147,8 +133,8 @@ public class Arguments {
      * Parses a {@link Vector3d}. This parser supports the use of relative
      * positions as well as the modifiers #me, #self, #first, and #target.
      */
-    public static Vector3dParser vector3d() {
-        return VECTOR_3D;
+    public static PositionParser position() {
+        return POSITION;
     }
 
     /**
@@ -157,6 +143,22 @@ public class Arguments {
      */
     public static LocationParser location() {
         return LOCATION;
+    }
+
+    /**
+     * Parses a {@link String} intended to represent a command. This parser only
+     * provides suggestions for the command; it does not verify input.
+     */
+    public static CommandParser command() {
+        return COMMAND;
+    }
+
+    /**
+     * Parses a {@link java.time.LocalDate}. This parser uses the same format
+     * as defined by {@link java.time.LocalDate#parse(CharSequence)}.
+     */
+    public static DateParser date() {
+        return DATE;
     }
 
     /**
@@ -176,15 +178,6 @@ public class Arguments {
      */
     public static <T extends Number & Comparable<T>> NumberParser<T> number(Function<String, T> function, ImmutableMap<String, String> messages) {
         return new NumberParser<>(function, messages);
-    }
-
-    /**
-     * Creates a new {@link DurationParser}. Available messages are:
-     *
-     *  invalid-format: If the argument does not match the expected pattern
-     */
-    public static DurationParser duration(ImmutableMap<String, String> messages) {
-        return new DurationParser(messages);
     }
 
     /**
@@ -235,7 +228,7 @@ public class Arguments {
     }
 
     /**
-     * Creates a new {@link Vector3dParser}. Available messages are:
+     * Creates a new {@link PositionParser}. Available messages are:
      *
      *  not-entity: If #first or #target is used but the source is not an Entity
      *  not-locatable: If #me, #self, or relative coordinates are used but the
@@ -244,16 +237,41 @@ public class Arguments {
      *  invalid-modifier: If a modifier (#arg) that is unknown is used
      *  invalid-number: If a given coordinate is not a double
      */
-    public static Vector3dParser vector3d(ImmutableMap<String, String> messages) {
-        return new Vector3dParser(messages);
+    public static PositionParser position(ImmutableMap<String, String> messages) {
+        return new PositionParser(messages);
     }
 
     /**
      * Creates a new {@link LocationParser} using the World and Vector3d values
      * from the given parsers. There are no messages used.
      */
-    public static LocationParser location(ValueParser<World> world, ValueParser<Vector3d> vector3d, ImmutableMap<String, String> unused) {
-        return new LocationParser(world, vector3d, unused);
+    public static LocationParser location(ValueParser<World> world, ValueParser<Vector3d> position, ImmutableMap<String, String> unused) {
+        return new LocationParser(world, position, unused);
+    }
+
+    /**
+     * Creates a new {@link CommandParser}.
+     */
+    public static CommandParser command(ImmutableMap<String, String> messages) {
+        return new CommandParser(messages);
+    }
+
+    /**
+     * Creates a new {@link DateParser}. Available messages are:
+     *
+     *  invalid-format: If the argument does not match the expected format
+     */
+    public static DateParser date(ImmutableMap<String, String> messages) {
+        return new DateParser(messages);
+    }
+
+    /**
+     * Creates a new {@link DurationParser}. Available messages are:
+     *
+     *  invalid-format: If the argument does not match the expected format
+     */
+    public static DurationParser duration(ImmutableMap<String, String> messages) {
+        return new DurationParser(messages);
     }
 
     /**

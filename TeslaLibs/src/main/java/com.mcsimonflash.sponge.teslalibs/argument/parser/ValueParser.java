@@ -1,20 +1,16 @@
-package com.mcsimonflash.sponge.teslalibs.command.arguments.parser;
+package com.mcsimonflash.sponge.teslalibs.argument.parser;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Range;
-import com.mcsimonflash.sponge.teslalibs.command.arguments.Arguments;
-import com.mcsimonflash.sponge.teslalibs.command.arguments.CommandElement;
+import com.mcsimonflash.sponge.teslalibs.argument.Arguments;
+import com.mcsimonflash.sponge.teslalibs.argument.CommandElement;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.ArgumentParseException;
 import org.spongepowered.api.command.args.CommandArgs;
 import org.spongepowered.api.command.args.CommandContext;
-import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.Identifiable;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Predicate;
 

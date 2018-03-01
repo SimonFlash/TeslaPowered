@@ -1,4 +1,4 @@
-package com.mcsimonflash.sponge.teslalibs.command.arguments.parser;
+package com.mcsimonflash.sponge.teslalibs.argument.parser;
 
 import com.google.common.collect.ImmutableMap;
 import org.spongepowered.api.command.CommandSource;
@@ -8,6 +8,7 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.text.Text;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 public class OptionalParser<T> extends DelegateParser<T, Optional<T>> {
 
@@ -29,6 +30,22 @@ public class OptionalParser<T> extends DelegateParser<T, Optional<T>> {
             args.setState(state);
             return Optional.empty();
         }
+    }
+
+    /**
+     * Creates a new {@link ValueParser} that returns the optional value if
+     * present or else the given value.
+     */
+    public ValueParser<T> orElse(T value) {
+        return map(p -> p.orElse(value));
+    }
+
+    /**
+     * Creates a new {@link ValueParser} that returns the optional value if
+     * present or else gets the value from the given {@link Supplier<T>}.
+     */
+    public ValueParser<T> orElse(Supplier<T> supplier) {
+        return map(p -> p.orElseGet(supplier));
     }
 
 }

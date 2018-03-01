@@ -1,4 +1,4 @@
-package com.mcsimonflash.sponge.teslalibs.command.arguments.parser;
+package com.mcsimonflash.sponge.teslalibs.argument.parser;
 
 import com.google.common.collect.ImmutableMap;
 import org.spongepowered.api.command.CommandSource;

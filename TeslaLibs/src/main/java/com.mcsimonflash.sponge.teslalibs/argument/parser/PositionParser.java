@@ -1,9 +1,9 @@
-package com.mcsimonflash.sponge.teslalibs.command.arguments.parser;
+package com.mcsimonflash.sponge.teslalibs.argument.parser;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.mcsimonflash.sponge.teslalibs.command.arguments.Arguments;
+import com.mcsimonflash.sponge.teslalibs.argument.Arguments;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.ArgumentParseException;
 import org.spongepowered.api.command.args.CommandArgs;
@@ -17,11 +17,11 @@ import org.spongepowered.api.world.Locatable;
 import java.util.List;
 import java.util.Optional;
 
-public class Vector3dParser extends StandardParser<Vector3d> {
+public class PositionParser extends StandardParser<Vector3d> {
 
     public static final ImmutableList<String> MODIFIERS = ImmutableList.of("#me", "#self", "#first", "#target");
 
-    public Vector3dParser(ImmutableMap<String, String> messages) {
+    public PositionParser(ImmutableMap<String, String> messages) {
         super(messages);
     }
 
@@ -85,7 +85,7 @@ public class Vector3dParser extends StandardParser<Vector3d> {
      * location if the source is a player.
      */
     public OrSourceParser<Vector3d> orSource() {
-        return Arguments.orSource(s -> ((Player) s).getLocation().getPosition(), this, ImmutableMap.of("exception", "Unable to parse vector3d and source is not a Player."));
+        return Arguments.orSource(s -> ((Player) s).getLocation().getPosition(), this, ImmutableMap.of("exception", "Unable to parse position and source is not a Player."));
     }
 
 }

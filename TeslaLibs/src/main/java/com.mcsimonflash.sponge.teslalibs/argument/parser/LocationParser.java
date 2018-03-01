@@ -1,4 +1,4 @@
-package com.mcsimonflash.sponge.teslalibs.command.arguments.parser;
+package com.mcsimonflash.sponge.teslalibs.argument.parser;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.ImmutableMap;
@@ -14,17 +14,17 @@ import java.util.List;
 public class LocationParser extends StandardParser<Location<World>> {
 
     private ValueParser<World> world;
-    private ValueParser<Vector3d> vector3d;
+    private ValueParser<Vector3d> position;
 
-    public LocationParser(ValueParser<World> world, ValueParser<Vector3d> vector3d, ImmutableMap<String, String> unused) {
+    public LocationParser(ValueParser<World> world, ValueParser<Vector3d> position, ImmutableMap<String, String> unused) {
         super(unused);
         this.world = world;
-        this.vector3d = vector3d;
+        this.position = position;
     }
 
     @Override
     public Location<World> parseValue(CommandSource src, CommandArgs args) throws ArgumentParseException {
-        return new Location<>(world.parseValue(src, args), vector3d.parseValue(src, args));
+        return new Location<>(world.parseValue(src, args), position.parseValue(src, args));
     }
 
     @Override
@@ -32,7 +32,7 @@ public class LocationParser extends StandardParser<Location<World>> {
         Object state = args.getState();
         try {
             world.parseValue(src, args);
-            return vector3d.complete(src, args, ctx);
+            return position.complete(src, args, ctx);
         } catch (ArgumentParseException ignored) {
             args.setState(state);
             return world.complete(src, args, ctx);

@@ -1,11 +1,11 @@
-package com.mcsimonflash.sponge.teslalibs.command.arguments;
+package com.mcsimonflash.sponge.teslalibs.argument;
 
 import com.google.common.annotations.Beta;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.mcsimonflash.sponge.teslalibs.command.arguments.parser.ValueParser;
+import com.mcsimonflash.sponge.teslalibs.argument.parser.ValueParser;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.ArgumentParseException;
 import org.spongepowered.api.command.args.CommandArgs;

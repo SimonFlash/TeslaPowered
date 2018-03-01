@@ -1,6 +1,6 @@
-package com.mcsimonflash.sponge.teslalibs.command.arguments;
+package com.mcsimonflash.sponge.teslalibs.argument;
 
-import com.mcsimonflash.sponge.teslalibs.command.arguments.parser.ValueParser;
+import com.mcsimonflash.sponge.teslalibs.argument.parser.ValueParser;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.ArgumentParseException;
 import org.spongepowered.api.command.args.CommandArgs;
@@ -16,6 +16,10 @@ public class CommandElement<T> extends org.spongepowered.api.command.args.Comman
     public CommandElement(Text key, ValueParser<T> parser) {
         super(key);
         this.parser = parser;
+    }
+
+    public ValueParser<T> getParser() {
+        return parser;
     }
 
     @Override

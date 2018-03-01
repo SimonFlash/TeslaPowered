@@ -1,4 +1,4 @@
-package com.mcsimonflash.sponge.teslalibs.command.arguments.parser;
+package com.mcsimonflash.sponge.teslalibs.argument.parser;
 
 import com.google.common.collect.ImmutableMap;
 import org.spongepowered.api.Sponge;
@@ -35,8 +35,11 @@ public class StringParser extends StandardParser<String> {
     @Override
     public List<String> complete(CommandSource src, CommandArgs args, CommandContext ctx) {
         List<String> all = args.getAll();
-        String arg = all.size() > 0 ? all.get(all.size() - 1) : "";
-        return Sponge.getServer().getOnlinePlayers().stream().map(User::getName).filter(n -> n.toLowerCase().startsWith(arg)).collect(Collectors.toList());
+        String arg = all.isEmpty() ? "" : all.get(all.size() - 1);
+        return Sponge.getServer().getOnlinePlayers().stream()
+                .map(User::getName)
+                .filter(n -> n.toLowerCase().startsWith(arg))
+                .collect(Collectors.toList());
     }
 
 }
