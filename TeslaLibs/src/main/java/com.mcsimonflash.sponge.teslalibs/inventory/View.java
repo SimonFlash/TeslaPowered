@@ -7,57 +7,55 @@ import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
-import org.spongepowered.api.item.inventory.property.InventoryTitle;
+import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.property.SlotIndex;
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
 import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.text.Text;
 
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class View implements Animatable<Layout> {
 
     private final Inventory inventory;
     private final Map<Integer, Element> slots = Maps.newHashMap();
-    private final PluginContainer container;
-    private boolean closeable = true;
+    private final Consumer<Action<InteractInventoryEvent.Close>> closeAction;
 
     /**
      * @see #of(InventoryArchetype, PluginContainer)
      */
-    private View(InventoryArchetype archetype, PluginContainer container) {
-        this.inventory = Inventory.builder()
-                .of(archetype)
-                .property(InventoryTitle.PROPERTY_NAME, InventoryTitle.of(Text.EMPTY))
-                .listener(InteractInventoryEvent.Close.class, this::processClose)
+    private View(Inventory.Builder builder, Consumer<Action<InteractInventoryEvent.Close>> closeAction, PluginContainer container) {
+        this.inventory = builder
                 .listener(ClickInventoryEvent.class, this::processClick)
+                .listener(InteractInventoryEvent.Close.class, this::processClose)
                 .build(container);
-        this.container = container;
+        this.closeAction = closeAction;
     }
 
     /**
-     * Creates a new View with the given archetype for the given container.
+     * Creates a new {@link View} with the given archetype.
      *
-     * @param archetype the archetype of this inventory
-     * @param container the container creating this view
-     * @return the new view
+     * @see View.Builder methods
      */
-    public static View of(InventoryArchetype archetype, PluginContainer container) {
-        return new View(archetype, container);
+    public View of(InventoryArchetype archetype, PluginContainer container) {
+        return builder().archetype(archetype).build(container);
+    }
+
+    /**
+     * Opens this view for the given player, returning 'true' if successful.
+     */
+    public boolean open(Player player) {
+        return player.openInventory(inventory).isPresent();
     }
 
     /**
      * Defines this view as encoded by the given layout. This method sets every
      * slot in the inventory with a registered element or {@link Element#EMPTY}.
-     *
-     * @param layout the layout representing this view
-     * @return this view
      */
     public View define(Layout layout) {
         slots.clear();
         for (int i = 0; i < inventory.capacity(); i++) {
-            setSlot(i, layout.getElement(i));
+            setElement(i, layout.getElement(i));
         }
         return this;
     }
@@ -65,71 +63,31 @@ public class View implements Animatable<Layout> {
     /**
      * Updates the existing view with the given layout. Indexes not present in
      * the layout will not have their associated slot changed.
-     *
-     * @param layout the layout to update this view
-     * @return this view
      */
     public View update(Layout layout) {
-        layout.getElements().forEach(this::setSlot);
+        layout.getElements().forEach(this::setElement);
         return this;
     }
 
     /**
-     * Sets the slot of the given index to use the given element.
-     *
-     * @param index the slot index
-     * @param element the element
+     * Sets the element at the given index and adds it to the element registry.
      */
-    public void setSlot(int index, Element element) {
+    public void setElement(int index, Element element) {
         inventory.query(QueryOperationTypes.INVENTORY_PROPERTY.of(SlotIndex.of(index))).first().set(element.getItem().createStack());
         slots.put(index, element);
-    }
-
-    /**
-     * Sets whether this inventory is closeable by the player. This view can
-     * always be closed using {@link #close(Player)}.
-     *
-     * @param closeable true if the view can be closed, else false
-     */
-    public void setCloseable(boolean closeable) {
-        this.closeable = closeable;
-    }
-
-    /**
-     * Opens this view for the given player.
-     *
-     * @param player the player
-     */
-    public void open(Player player) {
-        Task.builder().execute(t -> player.openInventory(inventory)).submit(container);
-    }
-
-    /**
-     * Closes this view for the given player, regardless of whether this view
-     * is closeable or not.
-     *
-     * @param player the player
-     */
-    public void close(Player player) {
-        boolean closeable = this.closeable;
-        this.closeable = true;
-        player.closeInventory();
-        this.closeable = closeable;
     }
 
     /**
      * Processes a ClickInventoryEvent for the inventory of this view. If a
      * player is present, the slot is within this inventory, and an element is
      * registered for that slot, the element will be processed.
-     *
-     * @param event the event
      */
     private void processClick(ClickInventoryEvent event) {
         event.setCancelled(true);
         event.getCause().first(Player.class).ifPresent(p -> event.getTransactions().forEach(t -> t.getSlot().getProperty(SlotIndex.class, "slotindex").ifPresent(i -> {
             Element element = slots.get(i.getValue());
             if (element != null) {
-                Task.builder().execute(task -> element.process(p)).submit(container);
+                element.process(new Action.Click<>(event, p, element, t.getSlot()));
             }
         })));
     }
@@ -137,21 +95,64 @@ public class View implements Animatable<Layout> {
     /**
      * Processes an InteractInventoryEvent.Close for the inventory of this view.
      * If this inventory is not closeable, the event will be canceled.
-     *
-     * @param event the event
      */
     private void processClose(InteractInventoryEvent.Close event) {
-        event.setCancelled(!closeable);
+        event.getCause().first(Player.class).ifPresent(p -> closeAction.accept(new Action<>(event, p)));
     }
 
     /**
-     * Updates this view with the given layout. Used in animations.
-     *
-     * @param frame the layout of the frame
+     * Updates this view with the given layout frame.
      */
     @Override
     public void nextFrame(Layout frame) {
         update(frame);
+    }
+
+    /**
+     * Creates a new builder for creating a {@link View}.
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+
+        private static final Consumer<Action<InteractInventoryEvent.Close>> NONE = a -> {};
+
+        private Inventory.Builder builder = Inventory.builder();
+        private Consumer<Action<InteractInventoryEvent.Close>> closeAction = NONE;
+
+        /**
+         * Sets the archetype for the backing inventory.
+         */
+        public Builder archetype(InventoryArchetype archetype) {
+            builder.of(archetype);
+            return this;
+        }
+
+        /**
+         * Adds a property to the backing inventory
+         */
+        public Builder property(InventoryProperty property) {
+            builder.property(property);
+            return this;
+        }
+
+        /**
+         * Sets the close action that is accepted when this view is closed.
+         */
+        public Builder close(Consumer<Action<InteractInventoryEvent.Close>> action) {
+            closeAction = action;
+            return this;
+        }
+
+        /**
+         * @return the created view
+         */
+        public View build(PluginContainer container) {
+            return new View(builder, closeAction, container);
+        }
+
     }
 
 }
