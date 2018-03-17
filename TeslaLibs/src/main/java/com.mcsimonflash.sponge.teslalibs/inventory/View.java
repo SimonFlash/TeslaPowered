@@ -11,6 +11,7 @@ import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.property.SlotIndex;
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.scheduler.Task;
 
 import java.util.Map;
 import java.util.function.Consumer;
@@ -20,6 +21,7 @@ public class View implements Animatable<Layout> {
     private final Inventory inventory;
     private final Map<Integer, Element> slots = Maps.newHashMap();
     private final Consumer<Action<InteractInventoryEvent.Close>> closeAction;
+    private final PluginContainer container;
 
     /**
      * @see #of(InventoryArchetype, PluginContainer)
@@ -30,6 +32,7 @@ public class View implements Animatable<Layout> {
                 .listener(InteractInventoryEvent.Close.class, this::processClose)
                 .build(container);
         this.closeAction = closeAction;
+        this.container = container;
     }
 
     /**
@@ -42,10 +45,11 @@ public class View implements Animatable<Layout> {
     }
 
     /**
-     * Opens this view for the given player, returning 'true' if successful.
+     * Opens this view for the given player. The opening of the inventory is
+     * delayed by a tick to ensure any events are properly canceled.
      */
-    public boolean open(Player player) {
-        return player.openInventory(inventory).isPresent();
+    public void open(Player player) {
+        Task.builder().execute(t -> player.openInventory(inventory)).delayTicks(1).submit(container);
     }
 
     /**
@@ -141,7 +145,7 @@ public class View implements Animatable<Layout> {
         /**
          * Sets the close action that is accepted when this view is closed.
          */
-        public Builder close(Consumer<Action<InteractInventoryEvent.Close>> action) {
+        public Builder onClose(Consumer<Action<InteractInventoryEvent.Close>> action) {
             closeAction = action;
             return this;
         }

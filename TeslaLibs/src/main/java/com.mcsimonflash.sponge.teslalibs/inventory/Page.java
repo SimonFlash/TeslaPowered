@@ -62,8 +62,7 @@ public class Page {
             View.Builder builder = View.builder().archetype(archetype);
             properties.forEach(builder::property);
             views.add(builder.build(container).define(Layout.builder()
-                    .dimension(layout.getDimension())
-                    .setAll(layout.getElements())
+                    .from(layout)
                     .replace(FIRST, createElement("First Page", i, 1))
                     .replace(LAST, createElement("Last Page", i, pages))
                     .replace(NEXT, createElement("Next Page", i, i == pages ? i : i + 1))
@@ -82,9 +81,9 @@ public class Page {
         ItemStack item = ItemStack.builder()
                 .itemType(page == target ? ItemTypes.MAP : ItemTypes.PAPER)
                 .add(Keys.DISPLAY_NAME, Text.of(name, " (", target, ")"))
-                .quantity(page)
+                .quantity(target)
                 .build();
-        return page == target ? Element.of(item) : Element.of(item, a -> views.get(page - 1).open(a.getPlayer()));
+        return page == target ? Element.of(item) : Element.of(item, a -> open(a.getPlayer(), target));
     }
 
     /**

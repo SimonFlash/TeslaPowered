@@ -26,7 +26,7 @@ public class Element {
      * @see Element.Builder methods
      */
     public static Element of(ItemStack item, Consumer<Action.Click> clickAction) {
-        return builder().item(item).click(clickAction).build();
+        return builder().item(item).onClick(clickAction).build();
     }
 
     /**
@@ -84,7 +84,7 @@ public class Element {
         /**
          * Sets the click action that is accepted when this element is clicked.
          */
-        public Builder click(Consumer<Action.Click> clickAction) {
+        public Builder onClick(Consumer<Action.Click> clickAction) {
             this.clickAction = clickAction;
             return this;
         }

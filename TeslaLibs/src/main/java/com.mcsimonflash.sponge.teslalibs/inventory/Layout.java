@@ -203,6 +203,16 @@ public class Layout {
         }
 
         /**
+         * Copies the dimension and elements of the given layout to this one.
+         */
+        public Builder from(Layout layout) {
+            elements.clear();
+            dimension(layout.getDimension());
+            setAll(layout.getElements());
+            return this;
+        }
+
+        /**
          * @return the created layout
          */
         public Layout build() {
