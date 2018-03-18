@@ -202,6 +202,7 @@ public class Arguments {
      * Creates a new {@link UserParser}. Available message are:
      *
      *  no-user: If the argument is not the name of a user
+     *  invalid-name: If the argument is not in the format of a username
      */
     public static UserParser user(ImmutableMap<String, String> messages) {
         return new UserParser(messages);

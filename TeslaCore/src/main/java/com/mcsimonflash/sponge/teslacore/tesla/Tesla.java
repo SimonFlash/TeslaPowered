@@ -1,59 +1,60 @@
 package com.mcsimonflash.sponge.teslacore.tesla;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import com.mcsimonflash.sponge.teslacore.utils.TeslaUtils;
 import com.mcsimonflash.sponge.teslacore.logger.LoggerService;
+import com.mcsimonflash.sponge.teslalibs.command.CommandService;
 import com.mcsimonflash.sponge.teslalibs.message.MessageService;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
 
-import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
 
 public abstract class Tesla {
 
+    public static final Optional<URL> DISCORD = TeslaUtils.parseURL("https://discord.gg/4wayq37");
     private static final Map<String, Tesla> REGISTRY = Maps.newHashMap();
-    public static final Optional<URL> Discord = TeslaUtils.parseURL("https://discord.gg/4wayq37");
 
-    public final PluginContainer Container;
-    public final String Id;
-    public final String Name;
-    public final String Version;
-    public final String Description;
-    public final Optional<URL> URL;
-    public final Path Directory;
-    public final LoggerService Logger;
-    public final MessageService Messages;
-    public final Text Prefix;
+    private final PluginContainer container;
+    private final Path directory;
+    private final LoggerService logger;
+    private final CommandService commands;
+    private final MessageService messages;
 
     public Tesla(PluginContainer container) {
-        Container = container;
-        Id = Container.getId();
-        Name = Container.getName();
-        Version = Container.getVersion().orElse("undefined");
-        Description = Container.getDescription().orElse("undefined");
-        URL = TeslaUtils.parseURL(Container.getUrl().orElse("https://en.wikipedia.org/wiki/Nikola_Tesla"));
-        Directory = Sponge.getConfigManager().getPluginConfig(Container).getDirectory();
-        Logger = new LoggerService(Container.getLogger());
-        MessageService ms;
-        try {
-            Path translations = Directory.resolve("translations");
-            Files.createDirectories(translations);
-            Container.getAsset("messages.properties").get().copyToFile(translations.resolve("messages.properties"), false, true);
-            ms = MessageService.of(translations, "messages");
-        } catch (IOException e) {
-            Logger.error("An error occurred initializing message translations. Using internal copies.");
-            ms = MessageService.of(container, "messages");
-        }
-        Messages = ms;
-        Prefix = Text.of(TextColors.DARK_GRAY, "[", TextColors.YELLOW, "Tesla", TextColors.GOLD, Name.substring(5), TextColors.DARK_GRAY, "]", TextColors.GRAY, " ");
-        REGISTRY.put(Id, this);
+        this.container = container;
+        directory = Sponge.getConfigManager().getPluginConfig(container).getDirectory();
+        logger = LoggerService.of(container);
+        messages = TeslaUtils.getMessageService(this);
+        commands = CommandService.of(container);
+        REGISTRY.put(container.getId(), this);
+    }
+
+    public PluginContainer getContainer() {
+        return container;
+    }
+
+    public Path getDirectory() {
+        return directory;
+    }
+
+    public LoggerService getLogger() {
+        return logger;
+    }
+
+    public MessageService getMessages() {
+        return messages;
+    }
+
+    public CommandService getCommands() {
+        return commands;
+    }
+
+    public static ImmutableMap<String, Tesla> getRegistry() {
+        return ImmutableMap.copyOf(REGISTRY);
     }
 
 }

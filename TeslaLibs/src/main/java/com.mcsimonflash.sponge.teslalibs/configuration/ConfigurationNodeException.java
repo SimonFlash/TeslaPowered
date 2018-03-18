@@ -8,7 +8,7 @@ public class ConfigurationNodeException extends ObjectMappingException {
     private final ConfigurationNode node;
 
     /**
-     * Creates a new NodedObjectMappingException for the given node and given
+     * Creates a new ConfigurationNodeException for the given node and given
      * message.
      *
      * @param node the node
@@ -20,7 +20,7 @@ public class ConfigurationNodeException extends ObjectMappingException {
     }
 
     /**
-     * Creates a new NodedObjectMappingException for the given node using the
+     * Creates a new ConfigurationNodeException for the given node using the
      * given format and arguments for the message.
      *
      * @param node the node
@@ -32,8 +32,8 @@ public class ConfigurationNodeException extends ObjectMappingException {
     }
 
     /**
-     * Creates a new NodedObjectMappingException for the given node with the
-     * give cause.
+     * Creates a new ConfigurationNodeException for the given node with the
+     * given cause.
      *
      * @param node the node
      * @param cause the cause

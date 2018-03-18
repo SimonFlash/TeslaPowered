@@ -2,7 +2,9 @@ package com.mcsimonflash.sponge.teslalibs.configuration;
 
 import com.google.common.reflect.TypeToken;
 import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.SimpleConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
+import ninja.leaping.configurate.commented.SimpleCommentedConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
 import java.util.function.Consumer;
@@ -11,9 +13,6 @@ public class NodeUtils {
 
     /**
      * Accepts the given consumer if the given node is virtual.
-     *
-     * @param node the node
-     * @param consumer the consumer
      */
     public static <T extends ConfigurationNode> void ifVirtual(T node, Consumer<T> consumer) {
         if (node.isVirtual()) {
@@ -23,9 +22,6 @@ public class NodeUtils {
 
     /**
      * Accepts the given consumer if the given node is attached (not virtual).
-     *
-     * @param node the node
-     * @param consumer the consumer
      */
     public static <T extends ConfigurationNode> void ifAttached(T node, Consumer<T> consumer) {
         if (!node.isVirtual()) {
@@ -36,9 +32,6 @@ public class NodeUtils {
     /**
      * Returns true if the given node has a parent. If the node is virtual, this
      * result may not be accurate.
-     *
-     * @param node the node
-     * @return true if the node's parent is not null
      */
     public static boolean hasParent(ConfigurationNode node) {
         return node.getParent() != null;
@@ -77,10 +70,14 @@ public class NodeUtils {
     }
 
     /**
+     * Copies a node into a new node of the correct type.
+     */
+    public static ConfigurationNode copy(ConfigurationNode node) {
+        return (node instanceof CommentedConfigurationNode ? SimpleCommentedConfigurationNode.root() : SimpleConfigurationNode.root()).setValue(node);
+    }
+
+    /**
      * Moves a node from one location to another deleting the previous location.
-     *
-     * @param from the node to move from
-     * @param to the node to move to
      */
     public static void move(ConfigurationNode from, ConfigurationNode to) {
         to.setValue(from);

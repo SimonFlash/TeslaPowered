@@ -4,22 +4,17 @@ plugins {
 }
 
 group 'com.mcsimonflash.sponge.teslapowered'
-ext {
-    teslapoweredversion = '1.0.1'
-    spongeapiversion = '7.1.0-SNAPSHOT'
-    completeversion = "-s${spongeapiversion.substring(0, 3)}-v${teslapoweredversion}"
-}
+version '1.1.0'
+ext.spongeversion = '7.1.0-SNAPSHOT'
 
 allprojects {
     apply plugin: 'java'
     apply plugin: 'org.spongepowered.plugin'
-
     dependencies {
-        compileOnly "org.spongepowered:spongeapi:${spongeapiversion}"
+        compileOnly "org.spongepowered:spongeapi:${spongeversion}"
     }
-
     jar {
-        archiveName = "${project.name}${completeversion}.jar"
+        archiveName = "${project.name}-s${spongeversion.substring(0, 3)}-v${this.version}.jar"
     }
 }
 
@@ -33,13 +28,12 @@ shadowJar {
         include project(":TeslaCore")
         include project(":TeslaLibs")
     }
-
-    archiveName = "${project.name}${completeversion}.jar"
+    archiveName = "${project.name}-s${spongeversion.substring(0, 3)}-v${version}.jar"
 }
 
 task copyJars(type: Copy) {
     from([subprojects.jar, shadowJar])
-    into project.file("#releases/${teslapoweredversion}")
+    into project.file("#releases/${version}")
 }
 
 build.dependsOn(shadowJar, copyJars)

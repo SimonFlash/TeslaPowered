@@ -14,11 +14,7 @@ public class Frame<T> {
     }
 
     /**
-     * Creates a new frame with the given {@param T} frame and length
-     *
-     * @param frame the frame
-     * @param length the length, in milliseconds
-     * @return the new frame
+     * Creates a new frame with the given frame and length in milliseconds
      */
     public static <T> Frame<T> of(T frame, int length) {
         return new Frame<>(frame, length);

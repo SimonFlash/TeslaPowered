@@ -27,8 +27,12 @@ public class UserParser extends StandardParser<User> {
     public User parseValue(CommandSource src, CommandArgs args) throws ArgumentParseException {
         String arg = args.next();
         Player player = Sponge.getServer().getPlayer(arg).orElse(null);
-        return player != null ? player : Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(arg).orElseThrow(() ->
-                args.createError(getMessage("no-user","No user found with name <arg>.", "arg", arg)));
+        try {
+            return player != null ? player : Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(arg).orElseThrow(() ->
+                    args.createError(getMessage("no-user", "No user found with name <arg>.", "arg", arg)));
+        } catch (IllegalArgumentException e) {
+            throw args.createError(getMessage("invalid-name", "Invalid name <arg>.", "arg", arg));
+        }
     }
 
     @Override
