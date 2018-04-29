@@ -25,7 +25,7 @@ public class OrSourceParser<T> extends DelegateParser<T, T> {
             args.setState(state);
             try {
                 return function.apply(src);
-            } catch (IllegalArgumentException ex) {
+            } catch (Exception ex) {
                 throw args.createError(getMessage("exception", ex.getMessage()));
             }
         }

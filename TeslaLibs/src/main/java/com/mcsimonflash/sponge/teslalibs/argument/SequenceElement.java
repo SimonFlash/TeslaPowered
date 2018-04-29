@@ -29,26 +29,26 @@ public class SequenceElement extends CommandElement {
 
     @Override
     public List<String> complete(CommandSource src, CommandArgs args, CommandContext ctx) {
-        Set<String> suggestions = Sets.newHashSet();
+        Set<String> completions = Sets.newHashSet();
         for (CommandElement element : elements) {
             Object state = args.getState();
             try {
                 element.parse(src, args, ctx);
                 if (args.hasNext()) {
                     if (args.getState().equals(state)) {
-                        suggestions.addAll(element.complete(src, args, ctx));
+                        completions.addAll(element.complete(src, args, ctx));
                         args.setState(state);
-                    } else if (suggestions.isEmpty()) {
-                        suggestions.clear();
+                    } else {
+                        completions.clear();
                     }
                     continue;
                 }
             } catch (ArgumentParseException ignored) {}
             args.setState(state);
-            suggestions.addAll(element.complete(src, args, ctx));
-            return ImmutableList.copyOf(suggestions);
+            completions.addAll(element.complete(src, args, ctx));
+            break;
         }
-        return ImmutableList.of();
+        return ImmutableList.copyOf(completions);
     }
 
     @Override
@@ -58,7 +58,7 @@ public class SequenceElement extends CommandElement {
 
     @Override
     @Deprecated
-    protected Object parseValue(CommandSource src, CommandArgs args) throws ArgumentParseException {
+    protected Object parseValue(CommandSource src, CommandArgs args) {
         throw new UnsupportedOperationException("Attempted to parse a value from sequence.");
     }
 

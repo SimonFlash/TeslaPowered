@@ -95,16 +95,17 @@ public class AnimUtils {
      * Return a point along a circle in the xz plane for the given radians.
      */
     public static Vector3f circle(float radians) {
-        return Vector3f.from(cos(radians), 0F, sin(radians));
+        return Vector3f.from(cos(radians), 0F, -sin(radians));
     }
 
     /**
      * Returns a point along a circle around a given axis for the given radians.
-     * The axis is oriented such that the x axis is on the xz plane. For the
-     * y axis, it is recommended to use {@link AnimUtils#circle(float)} instead.
+     * The axis is oriented such that the x' axis is on the xz plane and the z'
+     * axis is in the positive y direction. For rotating about the y axis, it is
+     * recommended to use {@link AnimUtils#circle(float)} instead.
      */
     public static Vector3f circle(float radians, Vector3f axis) {
-        return Quaternionf.fromAngleRadAxis(radians, axis).rotate(Vector3f.from(-axis.getZ(), 0F, axis.getX()));
+        return Quaternionf.fromAngleRadAxis(radians, axis).rotate(axis.equals(Vector3f.UNIT_Y) ? Vector3f.UNIT_X : Vector3f.from(-axis.getZ(), 0F, axis.getX()).normalize());
     }
 
     /**

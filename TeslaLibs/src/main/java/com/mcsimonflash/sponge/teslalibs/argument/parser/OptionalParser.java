@@ -23,13 +23,15 @@ public class OptionalParser<T> extends DelegateParser<T, Optional<T>> {
 
     @Override
     public Optional<T> parseValue(CommandSource src, CommandArgs args) {
-        Object state = args.getState();
-        try {
-            return Optional.of(delegate.parseValue(src, args));
-        } catch (ArgumentParseException e) {
-            args.setState(state);
-            return Optional.empty();
+        if (args.hasNext()) {
+            Object state = args.getState();
+            try {
+                return Optional.of(delegate.parseValue(src, args));
+            } catch (ArgumentParseException e) {
+                args.setState(state);
+            }
         }
+        return Optional.empty();
     }
 
     /**
