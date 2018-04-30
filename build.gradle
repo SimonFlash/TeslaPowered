@@ -3,18 +3,13 @@ plugins {
     id "com.github.johnrengelman.shadow" version "1.2.4"
 }
 
-allprojects {
-    ext.version = "1.1.1"
-}
-
 group "com.mcsimonflash.sponge.teslapowered"
-version = ext.version
 
 allprojects {
     apply plugin: "java"
     apply plugin: "org.spongepowered.plugin"
 
-    version = ext.version
+    version = "1.1.1"
 
     dependencies {
         compile "org.spongepowered:spongeapi:7.1.0-SNAPSHOT"
