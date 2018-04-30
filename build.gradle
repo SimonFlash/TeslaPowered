@@ -1,20 +1,27 @@
 plugins {
-    id 'org.spongepowered.plugin' version '0.8.1'
-    id 'com.github.johnrengelman.shadow' version '1.2.3'
+    id "org.spongepowered.plugin" version "0.8.1"
+    id "com.github.johnrengelman.shadow" version "1.2.4"
 }
 
-group 'com.mcsimonflash.sponge.teslapowered'
-version '1.1.1'
-ext.spongeversion = '7.1.0-SNAPSHOT'
+group "com.mcsimonflash.sponge.teslapowered"
 
 allprojects {
-    apply plugin: 'java'
-    apply plugin: 'org.spongepowered.plugin'
+    apply plugin: "java"
+    apply plugin: "org.spongepowered.plugin"
+
+    version = "1.1.1"
+
     dependencies {
-        compile "org.spongepowered:spongeapi:${spongeversion}"
+        compile "org.spongepowered:spongeapi:7.1.0-SNAPSHOT"
     }
-    jar {
-        archiveName = "${project.name}-s${spongeversion.substring(0, 3)}-v${this.version}.jar"
+
+    task sourcesJar(type: Jar, dependsOn: classes) {
+        from allprojects.collect { it.sourceSets.main.allSource }
+        classifier = "sources"
+    }
+
+    artifacts {
+        archives sourcesJar
     }
 }
 
@@ -28,11 +35,11 @@ shadowJar {
         include project(":TeslaCore")
         include project(":TeslaLibs")
     }
-    archiveName = "${project.name}-s${spongeversion.substring(0, 3)}-v${version}.jar"
+    classifier = null
 }
 
 task copyJars(type: Copy) {
-    from([subprojects.jar, shadowJar])
+    from([allprojects.jar, shadowJar])
     into project.file("#releases/${version}")
 }
 
