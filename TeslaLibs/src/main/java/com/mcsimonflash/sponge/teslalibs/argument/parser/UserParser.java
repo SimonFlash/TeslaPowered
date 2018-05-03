@@ -49,6 +49,13 @@ public class UserParser extends StandardParser<User> {
     }
 
     /**
+     * Creates a new {@link SelectorParser} that filters for {@link User}s.
+     */
+    public SelectorParser<User> selector() {
+        return Arguments.selector(s -> s.filter(User.class::isInstance).map(User.class::cast), this, ImmutableMap.of());
+    }
+
+    /**
      * Creates a new {@link ValueParser} that maps this user to their uuid.
      */
     public ValueParser<UUID> toUuid() {

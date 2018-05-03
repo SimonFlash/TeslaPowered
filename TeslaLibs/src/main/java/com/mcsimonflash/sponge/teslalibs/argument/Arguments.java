@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableMap;
 import com.mcsimonflash.sponge.teslalibs.argument.parser.*;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.util.Tristate;
@@ -15,6 +16,7 @@ import org.spongepowered.api.world.World;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 public class Arguments {
 
@@ -37,7 +39,9 @@ public class Arguments {
     private static final ChoicesParser<Boolean> BOOLEAN = choices(BOOLEANS, ImmutableMap.of("no-choice", "Expected <key> to be a boolean (true/false)."));
     private static final ChoicesParser<Tristate> TRISTATE = choices(TRISTATES, ImmutableMap.of("no-choice", "Expected <key> to be a tristate (true/false/undefined)."));
     private static final PlayerParser PLAYER = player(ImmutableMap.of());
+    private static final SelectorParser<Player> PLAYER_SELECTOR = PLAYER.selector();
     private static final UserParser USER = user(ImmutableMap.of());
+    private static final SelectorParser<User> USER_SELECTOR = USER.selector();
     private static final WorldParser WORLD = world(ImmutableMap.of());
     private static final PositionParser POSITION = position(ImmutableMap.of());
     private static final LocationParser LOCATION = location(WORLD.orSource(), POSITION, ImmutableMap.of());
@@ -109,17 +113,33 @@ public class Arguments {
     }
 
     /**
-     * Parses an {@link Player}. The argument is expected to be a player name.
+     * Parses an {@link Player} from a player's name.
      */
     public static PlayerParser player() {
         return PLAYER;
     }
 
     /**
-     * Parses an {@link User} Selectors are currently not supported.
+     * Parses {@link Player} entities with a selector. If the input is not a
+     * selector, this delegates to a {@link PlayerParser}.
+     */
+    public static SelectorParser<Player> playerSelector() {
+        return PLAYER_SELECTOR;
+    }
+
+    /**
+     * Parses an {@link User} from a user's name.
      */
     public static UserParser user() {
         return USER;
+    }
+
+    /**
+     * Parses {@link User} entities (which are {@link Player}s) with a selector.
+     * If the input is not a selector, this delegates to a {@link UserParser}.
+     */
+    public static SelectorParser<User> userSelector() {
+        return USER_SELECTOR;
     }
 
     /**
@@ -314,6 +334,17 @@ public class Arguments {
      */
     public static <T> OptionalParser<T> optional(ValueParser<T> delegate, ImmutableMap<String, String> unused) {
         return new OptionalParser<>(delegate, unused);
+    }
+
+    /**
+     * Creates a new {@link SelectorParser} that accepts a selector for entities
+     * of a given type. Entities that are not instances of the given class will
+     * be filtered out. The returned set may be empty.
+     *
+     *  invalid-selector: If the selector could not be parsed
+     */
+    public static <T> SelectorParser<T> selector(Function<Stream<Entity>, Stream<T>> function, ValueParser<T> delegate, ImmutableMap<String, String> messages) {
+        return new SelectorParser<>(function, delegate, messages);
     }
 
     /**

@@ -41,6 +41,13 @@ public class PlayerParser extends StandardParser<Player> {
     }
 
     /**
+     * Creates a new {@link SelectorParser} that filters for {@link Player}s.
+     */
+    public SelectorParser<Player> selector() {
+        return Arguments.selector(s -> s.filter(Player.class::isInstance).map(Player.class::cast), this, ImmutableMap.of());
+    }
+
+    /**
      * Creates a new {@link ValueParser} that maps this player to their uuid.
      */
     public ValueParser<UUID> toUuid() {
