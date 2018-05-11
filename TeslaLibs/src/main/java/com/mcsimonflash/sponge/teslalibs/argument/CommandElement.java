@@ -1,13 +1,12 @@
 package com.mcsimonflash.sponge.teslalibs.argument;
 
+import com.google.common.collect.ImmutableList;
 import com.mcsimonflash.sponge.teslalibs.argument.parser.ValueParser;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.ArgumentParseException;
 import org.spongepowered.api.command.args.CommandArgs;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.text.Text;
-
-import java.util.List;
 
 public class CommandElement<T> extends org.spongepowered.api.command.args.CommandElement implements ValueParser<T> {
 
@@ -33,7 +32,7 @@ public class CommandElement<T> extends org.spongepowered.api.command.args.Comman
     }
 
     @Override
-    public List<String> complete(CommandSource src, CommandArgs args, CommandContext ctx) {
+    public ImmutableList<String> complete(CommandSource src, CommandArgs args, CommandContext ctx) {
         return parser.complete(src, args, ctx);
     }
 

@@ -1,5 +1,6 @@
 package com.mcsimonflash.sponge.teslalibs.argument.parser;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.ArgumentParseException;
@@ -8,7 +9,6 @@ import org.spongepowered.api.command.args.CommandContext;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.List;
 import java.util.stream.Stream;
 
 public class DateParser extends StandardParser<LocalDate> {
@@ -23,12 +23,12 @@ public class DateParser extends StandardParser<LocalDate> {
         try {
             return LocalDate.parse(arg);
         } catch (DateTimeParseException e) {
-            throw args.createError(getMessage("invalid-format", "Unable to parse ", arg, " into a date: " + e.getMessage()));
+            throw args.createError(getMessage("invalid-format", "Input <arg> could not be parsed as a date: <exception>.", "arg", arg, "exception", e.getMessage()));
         }
     }
 
     @Override
-    public List<String> complete(CommandSource src, CommandArgs args, CommandContext ctx) {
+    public ImmutableList<String> complete(CommandSource src, CommandArgs args, CommandContext ctx) {
         return complete(args, Stream.of(LocalDate.now().toString()));
     }
 

@@ -10,8 +10,6 @@ import org.spongepowered.api.command.args.CommandArgs;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.world.Locatable;
 
-import java.util.List;
-
 public class CommandParser extends StandardParser<String> {
 
     public CommandParser(ImmutableMap<String, String> unused) {
@@ -24,10 +22,9 @@ public class CommandParser extends StandardParser<String> {
     }
 
     @Override
-    public List<String> complete(CommandSource src, CommandArgs args, CommandContext ctx) {
+    public ImmutableList<String> complete(CommandSource src, CommandArgs args, CommandContext ctx) {
         try {
-            String command = Arguments.remainingStrings().parseValue(src,args);
-            return Sponge.getCommandManager().getSuggestions(src, command, src instanceof Locatable ? ((Locatable) src).getLocation() : null);
+            return ImmutableList.copyOf(Sponge.getCommandManager().getSuggestions(src, Arguments.remainingStrings().parseValue(src, args), src instanceof Locatable ? ((Locatable) src).getLocation() : null));
         } catch (ArgumentParseException ignored) {}
         return ImmutableList.of();
     }

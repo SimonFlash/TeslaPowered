@@ -57,14 +57,15 @@ public class Arguments {
     }
 
     /**
-     * Parses the remaining arguments into a {@link String} joined by spaces.
+     * Parses a {@link String} from all remaining arguments, joined by spaces.
      */
     public static ValueParser<String> remainingStrings() {
         return REMAINING_STRINGS;
     }
 
     /**
-     * Parses an {@link Integer}.
+     * Parses an {@link Integer}. This supports decimal, hexadecimal, and octal
+     * numbers as defined by {@link Integer#decode(String)}
      */
     public static NumberParser<Integer> intObj() {
         return INTEGER;
@@ -85,7 +86,7 @@ public class Arguments {
     }
 
     /**
-     * Parses an {@link Double}.
+     * Parses an {@link Float}.
      */
     public static NumberParser<Float> floatObj() {
         return FLOAT;
@@ -113,7 +114,7 @@ public class Arguments {
     }
 
     /**
-     * Parses an {@link Player} from a player's name.
+     * Parses an {@link Player} from the name of an online player.
      */
     public static PlayerParser player() {
         return PLAYER;
@@ -128,7 +129,7 @@ public class Arguments {
     }
 
     /**
-     * Parses an {@link User} from a user's name.
+     * Parses an {@link User} from the name of a stored user.
      */
     public static UserParser user() {
         return USER;
@@ -143,7 +144,7 @@ public class Arguments {
     }
 
     /**
-     * Parses a {@link World}
+     * Parses a {@link World} from the name of a loaded world.
      */
     public static WorldParser world() {
         return WORLD;
@@ -159,7 +160,7 @@ public class Arguments {
 
     /**
      * Parses a {@link Location<World>}. This parser requires a position to be
-     * defined, but the world may be assumed if the source is a {@link Player}.
+     * defined, but the world may be assumed if the source has a location.
      */
     public static LocationParser location() {
         return LOCATION;
@@ -183,7 +184,7 @@ public class Arguments {
 
     /**
      * Parses a {@link Long} representing a duration in milliseconds. The input
-     * may be either a long (representing milliseconds) or of the pattern:
+     * may be either a long (representing milliseconds) or in the pattern:
      *
      *  [N]w[N]d[N]h[N]m[N]s[N]ms
      */
@@ -252,8 +253,8 @@ public class Arguments {
      * Creates a new {@link PositionParser}. Available messages are:
      *
      *  not-entity: If #first or #target is used but the source is not an Entity
-     *  not-locatable: If #me, #self, or relative coordinates are used but the
-     *          source is not a Locatable
+     *  not-locatable: If a modifier (#arg) or relative coordinates are used but
+     *          the source is not a Locatable
      *  invalid-format: If the number of vector components given is incorrect
      *  invalid-modifier: If a modifier (#arg) that is unknown is used
      *  invalid-number: If a given coordinate is not a double
@@ -299,10 +300,8 @@ public class Arguments {
      * Creates a new {@link PredicateParser} that tests the value returned by
      * the delegate. Available messages are:
      *
+     *  exception: If an exception is thrown when applying the predicate
      *  invalid-value: If the value does not match the predicate
-     *
-     * It is recommended to use the {@link ValueParser#filter(Predicate)} method
-     * for a functional approach.
      */
     public static <T> PredicateParser<T> predicate(Predicate<T> predicate, ValueParser<T> delegate, ImmutableMap<String, String> messages) {
         return new PredicateParser<>(predicate, delegate, messages);
@@ -310,17 +309,16 @@ public class Arguments {
 
     /**
      * Creates a new {@link FunctionParser} that converts the value returned by
-     * the delegate. There are no messages used.
+     * the delegate.
      *
-     * It is recommended to use the {@link ValueParser#map(Function)} method for
-     * a functional approach.
+     *  exception: If an exception is thrown when applying the function
      */
-    public static <T, R> FunctionParser<T, R> function(Function<T, R> function, ValueParser<T> delegate, ImmutableMap<String, String> unused) {
-        return new FunctionParser<>(function, delegate, unused);
+    public static <T, R> FunctionParser<T, R> function(Function<T, R> function, ValueParser<T> delegate, ImmutableMap<String, String> messages) {
+        return new FunctionParser<>(function, delegate, messages);
     }
 
     /**
-     * Creates a new {@link FunctionParser} that returns an optional of the
+     * Creates a new {@link OptionalParser} that returns an optional of the
      * value returned by the delegate or empty if an exception is thrown. This
      * parser will add the value to the context if the optional is present.
      * There are no messages used.
@@ -328,9 +326,6 @@ public class Arguments {
      * This parser cannot distinguish between exceptions caused by parsing a
      * value (such as an argument that is not a number) and exceptions from
      * modifying a value (such as checking if that number is in a range).
-     *
-     * It is recommended to use the {@link ValueParser#optional()} method for a
-     * functional approach.
      */
     public static <T> OptionalParser<T> optional(ValueParser<T> delegate, ImmutableMap<String, String> unused) {
         return new OptionalParser<>(delegate, unused);
@@ -341,6 +336,7 @@ public class Arguments {
      * of a given type. Entities that are not instances of the given class will
      * be filtered out. The returned set may be empty.
      *
+     *  exception: If an exception is thrown when applying the function
      *  invalid-selector: If the selector could not be parsed
      */
     public static <T> SelectorParser<T> selector(Function<Stream<Entity>, Stream<T>> function, ValueParser<T> delegate, ImmutableMap<String, String> messages) {
@@ -348,7 +344,9 @@ public class Arguments {
     }
 
     /**
-     * Creates a new {@link SequenceElement}.
+     * Creates a new {@link SequenceElement} that parses multiple elements in
+     * order. This element is designed with improvements for tab completions,
+     * particular with optional-like elements.
      */
     public static SequenceElement sequence(CommandElement... elements) {
         return new SequenceElement(ImmutableList.copyOf(elements));

@@ -1,6 +1,5 @@
 package com.mcsimonflash.sponge.teslalibs.argument;
 
-import com.google.common.annotations.Beta;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -17,19 +16,15 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-@Beta
 public class FlagsElement extends CommandElement {
 
-    public static final ValueParser<Boolean> TRUE = (src, args) -> Boolean.TRUE;
-
-    private final ImmutableMap<List<String>, CommandElement> flags;
+    private final ImmutableMap<ImmutableList<String>, CommandElement> flags;
     private final ImmutableMap<String, CommandElement> aliases;
 
-    public FlagsElement(Map<List<String>, CommandElement> flags) {
+    public FlagsElement(ImmutableMap<ImmutableList<String>, CommandElement> flags) {
         super(null);
-        this.flags = ImmutableMap.copyOf(flags);
+        this.flags = flags;
         ImmutableMap.Builder<String, CommandElement> builder = ImmutableMap.builder();
         flags.forEach((k, v) -> k.forEach(f -> builder.put("-" + f.toLowerCase(), v)));
         aliases = builder.build();
@@ -54,14 +49,14 @@ public class FlagsElement extends CommandElement {
     }
 
     @Override
-    public List<String> complete(CommandSource src, CommandArgs args, CommandContext ctx) {
-        List<List<String>> unused = Lists.newArrayList(flags.keySet());
+    public ImmutableList<String> complete(CommandSource src, CommandArgs args, CommandContext ctx) {
+        List<ImmutableList<String>> unused = Lists.newArrayList(flags.keySet());
         try {
             while (args.hasNext() && args.peek().startsWith("-")) {
                 String[] split = args.next().split("=", 2);
                 CommandElement element = aliases.get(split[0].toLowerCase());
                 if (element == null || split.length == 1 && !args.hasNext()) {
-                    return unused.stream().flatMap(Collection::stream).map(s -> "-" + s).filter(s -> s.toLowerCase().startsWith(split[0].toLowerCase())).collect(Collectors.toList());
+                    return unused.stream().flatMap(Collection::stream).map(s -> "-" + s).filter(s -> s.toLowerCase().startsWith(split[0].toLowerCase())).collect(ImmutableList.toImmutableList());
                 }
                 Object state = args.getState();
                 try {
@@ -70,19 +65,19 @@ public class FlagsElement extends CommandElement {
                 } catch (ArgumentParseException e) {
                     args.setState(state);
                     String start = split.length == 2 ? split[0] + "=" : "";
-                    return element.complete(src, args, ctx).stream().map(s -> start + s).collect(Collectors.toList());
+                    return element.complete(src, args, ctx).stream().map(s -> start + s).collect(ImmutableList.toImmutableList());
                 }
             }
         } catch (ArgumentParseException ignored) {}
         return args.nextIfPresent().map(String::toLowerCase).map(a -> unused.stream()
-                .flatMap(Collection::stream).map(s -> "-" + s).filter(s -> s.toLowerCase().startsWith(a)).collect(Collectors.toList()))
+                .flatMap(Collection::stream).map(s -> "-" + s).filter(s -> s.toLowerCase().startsWith(a)).collect(ImmutableList.toImmutableList()))
                 .orElse(ImmutableList.of());
     }
 
     @Override
     public Text getUsage(CommandSource src) {
         List<Object> args = Lists.newArrayList();
-        for (Map.Entry<List<String>, CommandElement> entry : flags.entrySet()) {
+        for (Map.Entry<ImmutableList<String>, CommandElement> entry : flags.entrySet()) {
             args.add("[" + String.join("|", entry.getKey()));
             Text usage = entry.getValue().getUsage(src);
             if (!usage.isEmpty()) {
@@ -96,13 +91,15 @@ public class FlagsElement extends CommandElement {
 
     @Override
     @Deprecated
-    protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
+    protected Object parseValue(CommandSource src, CommandArgs args) {
         throw new UnsupportedOperationException("Attempted to parse a value from flags.");
     }
 
     public static class Builder {
 
-        private Map<List<String>, CommandElement> flags = Maps.newHashMap();
+        private static final ValueParser<Boolean> TRUE = (src, args) -> Boolean.TRUE;
+
+        private Map<ImmutableList<String>, CommandElement> flags = Maps.newHashMap();
 
         /**
          * Adds a new flag with the given element and list of flags. The value
@@ -110,7 +107,7 @@ public class FlagsElement extends CommandElement {
          * any of the flag aliases.
          */
         public Builder flag(CommandElement element, String... flags) {
-            this.flags.put(Arrays.stream(flags).map(String::toLowerCase).collect(Collectors.toList()), element);
+            this.flags.put(Arrays.stream(flags).map(String::toLowerCase).collect(ImmutableList.toImmutableList()), element);
             return this;
         }
 
@@ -126,7 +123,7 @@ public class FlagsElement extends CommandElement {
          * Creates a new {@link FlagsElement} from this builder.
          */
         public FlagsElement build() {
-            return new FlagsElement(flags);
+            return new FlagsElement(ImmutableMap.copyOf(flags));
         }
 
     }

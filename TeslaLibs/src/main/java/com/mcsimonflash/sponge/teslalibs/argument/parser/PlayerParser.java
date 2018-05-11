@@ -1,5 +1,6 @@
 package com.mcsimonflash.sponge.teslalibs.argument.parser;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.mcsimonflash.sponge.teslalibs.argument.Arguments;
 import org.spongepowered.api.Sponge;
@@ -11,7 +12,6 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.util.Identifiable;
 
-import java.util.List;
 import java.util.UUID;
 
 public class PlayerParser extends StandardParser<Player> {
@@ -28,7 +28,7 @@ public class PlayerParser extends StandardParser<Player> {
     }
 
     @Override
-    public List<String> complete(CommandSource src, CommandArgs args, CommandContext ctx) {
+    public ImmutableList<String> complete(CommandSource src, CommandArgs args, CommandContext ctx) {
         return complete(args, Sponge.getServer().getOnlinePlayers().stream().map(User::getName));
     }
 

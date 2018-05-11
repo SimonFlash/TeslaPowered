@@ -9,12 +9,10 @@ import org.spongepowered.api.command.args.ArgumentParseException;
 import org.spongepowered.api.command.args.CommandArgs;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.util.blockray.BlockRay;
 import org.spongepowered.api.util.blockray.BlockRayHit;
 import org.spongepowered.api.world.Locatable;
 
-import java.util.List;
 import java.util.Optional;
 
 public class PositionParser extends StandardParser<Vector3d> {
@@ -76,16 +74,16 @@ public class PositionParser extends StandardParser<Vector3d> {
     }
 
     @Override
-    public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
+    public ImmutableList<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
         return complete(args, MODIFIERS.stream());
     }
 
     /**
      * Creates a new {@link OrSourceParser} that returns the position of their
-     * location if the source is a player.
+     * location if the source is {@link Locatable}.
      */
     public OrSourceParser<Vector3d> orSource() {
-        return Arguments.orSource(s -> ((Player) s).getLocation().getPosition(), this, ImmutableMap.of("exception", "Unable to parse position and source is not a Player."));
+        return Arguments.orSource(s -> ((Locatable) s).getLocation().getPosition(), this, ImmutableMap.of("exception", "Unable to parse position and source does not have a location."));
     }
 
 }

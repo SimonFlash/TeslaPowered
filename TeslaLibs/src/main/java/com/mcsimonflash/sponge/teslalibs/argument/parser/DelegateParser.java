@@ -1,11 +1,10 @@
 package com.mcsimonflash.sponge.teslalibs.argument.parser;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandArgs;
 import org.spongepowered.api.command.args.CommandContext;
-
-import java.util.List;
 
 public abstract class DelegateParser<T, R> extends StandardParser<R> {
 
@@ -17,7 +16,7 @@ public abstract class DelegateParser<T, R> extends StandardParser<R> {
     }
 
     @Override
-    public List<String> complete(CommandSource src, CommandArgs args, CommandContext ctx) {
+    public ImmutableList<String> complete(CommandSource src, CommandArgs args, CommandContext ctx) {
         return delegate.complete(src, args, ctx);
     }
 

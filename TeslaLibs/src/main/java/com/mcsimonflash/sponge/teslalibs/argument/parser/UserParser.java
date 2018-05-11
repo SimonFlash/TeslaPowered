@@ -1,5 +1,6 @@
 package com.mcsimonflash.sponge.teslalibs.argument.parser;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.mcsimonflash.sponge.teslalibs.argument.Arguments;
 import org.spongepowered.api.Sponge;
@@ -13,7 +14,6 @@ import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.util.Identifiable;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -36,7 +36,7 @@ public class UserParser extends StandardParser<User> {
     }
 
     @Override
-    public List<String> complete(CommandSource src, CommandArgs args, CommandContext ctx) {
+    public ImmutableList<String> complete(CommandSource src, CommandArgs args, CommandContext ctx) {
         return complete(args, Sponge.getServiceManager().provideUnchecked(UserStorageService.class).getAll().stream().map(GameProfile::getName).filter(Optional::isPresent).map(Optional::get));
     }
 

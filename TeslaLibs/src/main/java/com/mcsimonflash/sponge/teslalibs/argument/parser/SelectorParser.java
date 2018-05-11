@@ -3,6 +3,7 @@ package com.mcsimonflash.sponge.teslalibs.argument.parser;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
+import com.mcsimonflash.sponge.teslalibs.argument.Arguments;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.ArgumentParseException;
 import org.spongepowered.api.command.args.CommandArgs;
@@ -28,21 +29,36 @@ public class SelectorParser<T> extends DelegateParser<T, Set<T>> {
     @Override
     public Set<T> parseValue(CommandSource src, CommandArgs args) throws ArgumentParseException {
         if (args.hasNext() && args.peek().startsWith("@")) {
+            String arg = args.next();
             try {
-                return function.apply(Selector.parse(args.next()).resolve(src).stream()).collect(Collectors.toSet());
+                return function.apply(Selector.parse(arg).resolve(src).stream()).collect(Collectors.toSet());
             } catch (IllegalArgumentException e) {
-                throw args.createError(getMessage("invalid-selector", "The selector is not in the correct format: <arg>.", "arg", e.getMessage()));
+                throw args.createError(getMessage("invalid-selector", "The selector <arg> is not in the correct format: <exception>.", "arg", arg, "exception", e.getMessage()));
+            } catch (Exception e) {
+                throw args.createError(getMessage("exception", "<exception>", "exception", e.getMessage()));
             }
         }
         return Sets.newHashSet(delegate.parseValue(src, args));
     }
 
     @Override
-    public List<String> complete(CommandSource src, CommandArgs args, CommandContext ctx) {
+    public ImmutableList<String> complete(CommandSource src, CommandArgs args, CommandContext ctx) {
         Object state = args.getState();
         List<String> completions = delegate.complete(src, args, ctx);
         args.setState(state);
-        return ImmutableList.<String>builder().addAll(completions).addAll(Selector.complete(args.nextIfPresent().orElse(""))).build();
+        return ImmutableList.<String>builder()
+                .addAll(completions)
+                .addAll(Selector.complete(args.nextIfPresent().orElse("")))
+                .build();
+    }
+
+    /**
+     * Creates a new {@link OrSourceParser} that returns a {@link Set} of
+     * element(s) retrieved from the {@link CommandSource} if neither this
+     * selector or delegate parser were successful.
+     */
+    public OrSourceParser<Set<T>> orSource(Function<CommandSource, Set<T>> function) {
+        return Arguments.orSource(function, this, ImmutableMap.of());
     }
 
 }

@@ -3,11 +3,12 @@ package com.mcsimonflash.sponge.teslalibs.argument;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.*;
+import org.spongepowered.api.command.args.ArgumentParseException;
+import org.spongepowered.api.command.args.CommandArgs;
+import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.text.Text;
 
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -28,7 +29,7 @@ public class SequenceElement extends CommandElement {
     }
 
     @Override
-    public List<String> complete(CommandSource src, CommandArgs args, CommandContext ctx) {
+    public ImmutableList<String> complete(CommandSource src, CommandArgs args, CommandContext ctx) {
         Set<String> completions = Sets.newHashSet();
         for (CommandElement element : elements) {
             Object state = args.getState();

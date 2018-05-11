@@ -10,7 +10,6 @@ import org.spongepowered.api.command.args.CommandArgs;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.text.Text;
 
-import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -32,9 +31,9 @@ public interface ValueParser<T> {
     }
 
     /**
-     * Completes this parser for the given values.
+     * Completes this parser and returns an immutable list of suggestions.
      */
-    default List<String> complete(CommandSource src, CommandArgs args, CommandContext ctx) {
+    default ImmutableList<String> complete(CommandSource src, CommandArgs args, CommandContext ctx) {
         return ImmutableList.of();
     }
 

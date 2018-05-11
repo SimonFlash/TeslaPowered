@@ -26,7 +26,7 @@ public class OrSourceParser<T> extends DelegateParser<T, T> {
             try {
                 return function.apply(src);
             } catch (Exception ex) {
-                throw args.createError(getMessage("exception", ex.getMessage()));
+                throw args.createError(getMessage("exception", "<exception>", "exception", ex.getMessage()));
             }
         }
     }

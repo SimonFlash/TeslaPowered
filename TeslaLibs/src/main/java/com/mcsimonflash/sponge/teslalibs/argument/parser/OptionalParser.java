@@ -17,7 +17,7 @@ public class OptionalParser<T> extends DelegateParser<T, Optional<T>> {
     }
 
     @Override
-    public void parse(Text key, CommandSource src, CommandArgs args, CommandContext ctx) throws ArgumentParseException {
+    public void parse(Text key, CommandSource src, CommandArgs args, CommandContext ctx) {
         parseValue(src, args).ifPresent(v -> ctx.putArg(key, v));
     }
 
@@ -35,18 +35,18 @@ public class OptionalParser<T> extends DelegateParser<T, Optional<T>> {
     }
 
     /**
-     * Creates a new {@link ValueParser} that returns the optional value if
+     * Creates a new {@link FunctionParser} that returns the optional value if
      * present or else the given value.
      */
-    public ValueParser<T> orElse(T value) {
+    public FunctionParser<Optional<T>, T> orElse(T value) {
         return map(p -> p.orElse(value));
     }
 
     /**
-     * Creates a new {@link ValueParser} that returns the optional value if
+     * Creates a new {@link FunctionParser} that returns the optional value if
      * present or else gets the value from the given {@link Supplier<T>}.
      */
-    public ValueParser<T> orElse(Supplier<T> supplier) {
+    public FunctionParser<Optional<T>, T> orElseGet(Supplier<T> supplier) {
         return map(p -> p.orElseGet(supplier));
     }
 

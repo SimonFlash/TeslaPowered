@@ -1,12 +1,12 @@
 package com.mcsimonflash.sponge.teslalibs.argument.parser;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.ArgumentParseException;
 import org.spongepowered.api.command.args.CommandArgs;
 import org.spongepowered.api.command.args.CommandContext;
 
-import java.util.List;
 import java.util.Map;
 
 public class ChoicesParser<T> extends StandardParser<T> {
@@ -25,11 +25,11 @@ public class ChoicesParser<T> extends StandardParser<T> {
         if (value != null) {
             return value;
         }
-        throw args.createError(getMessage("no-choice", "No choice found for <arg>.", "arg", arg));
+        throw args.createError(getMessage("no-choice", "Input <arg> is not a valid choice.", "arg", arg));
     }
 
     @Override
-    public List<String> complete(CommandSource src, CommandArgs args, CommandContext ctx) {
+    public ImmutableList<String> complete(CommandSource src, CommandArgs args, CommandContext ctx) {
         return complete(args, choices.keySet().stream());
     }
 

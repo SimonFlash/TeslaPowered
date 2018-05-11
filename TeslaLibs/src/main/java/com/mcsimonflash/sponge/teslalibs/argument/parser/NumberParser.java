@@ -25,6 +25,8 @@ public class NumberParser<T extends Number & Comparable<T>> extends StandardPars
             return function.apply(arg);
         } catch (NumberFormatException e) {
             throw args.createError(getMessage("invalid-number", "Unable to parse <arg> into a number.", "arg", arg));
+        } catch (Exception e) {
+            throw args.createError(getMessage("exception", "Error parsing input <arg>: <exception>", "arg", arg, "exception", e.getMessage()));
         }
     }
 

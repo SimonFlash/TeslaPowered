@@ -19,8 +19,12 @@ public class PredicateParser<T> extends DelegateParser<T, T> {
     @Override
     public T parseValue(CommandSource src, CommandArgs args) throws ArgumentParseException {
         T value = delegate.parseValue(src, args);
-        if (predicate.test(value)) {
-            return value;
+        try {
+            if (predicate.test(value)) {
+                return value;
+            }
+        } catch (Exception e) {
+            throw args.createError(getMessage("exception", "<exception>", "exception", e.getMessage()));
         }
         throw args.createError(getMessage("invalid-value", "The value <value> does not meet the requirements for this argument.", "value", value));
     }
