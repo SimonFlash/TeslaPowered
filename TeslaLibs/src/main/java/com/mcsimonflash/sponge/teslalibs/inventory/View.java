@@ -40,7 +40,7 @@ public class View implements Animatable<Layout> {
      *
      * @see View.Builder methods
      */
-    public View of(InventoryArchetype archetype, PluginContainer container) {
+    public static View of(InventoryArchetype archetype, PluginContainer container) {
         return builder().archetype(archetype).build(container);
     }
 

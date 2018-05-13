@@ -47,7 +47,7 @@ public class Element {
      * Processes this elements click action with the given {@link Action.Click}.
      */
     public void process(Action.Click action) {
-        this.clickAction.accept(action);
+        clickAction.accept(action);
     }
 
     /**
@@ -59,10 +59,10 @@ public class Element {
 
     public static class Builder {
 
-        private static final Consumer<Action.Click> DEFAULT = a -> {};
+        private static final Consumer<Action.Click> NONE = a -> {};
 
         private ItemStackSnapshot item = ItemStackSnapshot.NONE;
-        private Consumer<Action.Click> clickAction = DEFAULT;
+        private Consumer<Action.Click> clickAction = NONE;
 
         /**
          * Sets the item to be the given {@link ItemStackSnapshot}.
@@ -73,7 +73,7 @@ public class Element {
         }
 
         /**
-         * Sets the item to be a snapshot of the give {@link ItemStack}.
+         * Sets the item to be a snapshot of the given {@link ItemStack}.
          *
          * @see Element.Builder#item(ItemStackSnapshot)
          */
@@ -84,8 +84,8 @@ public class Element {
         /**
          * Sets the click action that is accepted when this element is clicked.
          */
-        public Builder onClick(Consumer<Action.Click> clickAction) {
-            this.clickAction = clickAction;
+        public Builder onClick(Consumer<Action.Click> action) {
+            clickAction = action;
             return this;
         }
 

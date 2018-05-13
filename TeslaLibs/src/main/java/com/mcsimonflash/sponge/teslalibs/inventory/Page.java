@@ -6,7 +6,10 @@ import com.google.common.collect.Lists;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemTypes;
-import org.spongepowered.api.item.inventory.*;
+import org.spongepowered.api.item.inventory.InventoryArchetype;
+import org.spongepowered.api.item.inventory.InventoryArchetypes;
+import org.spongepowered.api.item.inventory.InventoryProperty;
+import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.property.AbstractInventoryProperty;
 import org.spongepowered.api.item.inventory.property.InventoryCapacity;
 import org.spongepowered.api.plugin.PluginContainer;
@@ -29,7 +32,7 @@ public class Page {
     private final PluginContainer container;
 
     /**
-     * @see Page#of(Layout, InventoryArchetype, PluginContainer)
+     * @see Page#of(InventoryArchetype, Layout, PluginContainer)
      */
     private Page(InventoryArchetype archetype, ImmutableList<InventoryProperty> properties, Layout layout, PluginContainer container) {
         this.archetype = archetype;
@@ -44,8 +47,8 @@ public class Page {
      *
      * @see Page.Builder methods
      */
-    public Page of(Layout layout, InventoryArchetype archetype, PluginContainer container) {
-        return Page.builder().layout(layout).archetype(archetype).build(container);
+    public static Page of(InventoryArchetype archetype, Layout layout, PluginContainer container) {
+        return Page.builder().archetype(archetype).layout(layout).build(container);
     }
 
     /**
@@ -54,10 +57,9 @@ public class Page {
      */
     public Page define(List<Element> elements) {
         views.clear();
-        int capacity = archetype.getProperty(InventoryCapacity.class)
-                .map(AbstractInventoryProperty::getValue)
-                .orElse(54) - layout.getElements().size();
-        int pages = elements.isEmpty() ? 1 : elements.size() / capacity + 1;
+        int capacity = archetype.getProperty(InventoryCapacity.class).map(AbstractInventoryProperty::getValue)
+                .orElse(layout.getDimension().getRows() * layout.getDimension().getColumns()) - layout.getElements().size();
+        int pages = elements.isEmpty() ? 1 : (elements.size() - 1) / capacity + 1;
         for (int i = 1; i <= pages; i++) {
             View.Builder builder = View.builder().archetype(archetype);
             properties.forEach(builder::property);
@@ -88,7 +90,7 @@ public class Page {
 
     /**
      * Opens the given page for the player. Pages are indexed starting at 1. If
-     * the index is out of bounds, the closed valid page will be opened.
+     * the index is out of bounds, the closest valid page will be opened.
      */
     public void open(Player player, int page) {
         views.get((page > 1 ? Math.min(page, views.size()) - 1 : 0)).open(player);

@@ -203,13 +203,41 @@ public class Layout {
         }
 
         /**
+         * Overlays the given layout onto this one starting at the given index.
+         * The top left corner of the layout starts from the index. The index
+         * must be within between 0 and this layout's capacity or an {@link
+         * IndexOutOfBoundsException} will be throw. If the given layout
+         * overflows, an {@link IllegalStateException} is thrown.
+         */
+        public Builder overlay(Layout layout, int index) {
+            Preconditions.checkElementIndex(index, capacity);
+            int rows = layout.getDimension().getRows(), columns = layout.getDimension().getColumns();
+            Preconditions.checkState(index % this.columns + columns < this.columns, "Layout overflows horizontally.");
+            Preconditions.checkState(index / this.rows + rows < this.rows, "Layout overflows vertically.");
+            for (int r = 0; r < rows; r++) {
+                for (int c = 0; c < columns; c++) {
+                    Element element = layout.elements.get(r * columns + c);
+                    if (element != null) {
+                        set(element, r * this.columns + index + c);
+                    }
+                }
+            }
+            return this;
+        }
+
+        /**
          * Copies the dimension and elements of the given layout to this one.
          */
         public Builder from(Layout layout) {
+            return reset().dimension(layout.getDimension()).setAll(layout.getElements());
+        }
+
+        /**
+         * Resets the layout to defaults.
+         */
+        public Builder reset() {
             elements.clear();
-            dimension(layout.getDimension());
-            setAll(layout.getElements());
-            return this;
+            return dimension(DEFAULT);
         }
 
         /**
