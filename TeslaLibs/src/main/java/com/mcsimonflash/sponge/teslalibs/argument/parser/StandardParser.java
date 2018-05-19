@@ -20,7 +20,7 @@ public abstract class StandardParser<T> implements ValueParser<T> {
         return Message.of(messages.getOrDefault(key, def)).args(args).toText();
     }
 
-    public final ImmutableList<String> complete(CommandArgs args, Stream<String> stream) {
+    public static ImmutableList<String> complete(CommandArgs args, Stream<String> stream) {
         return args.nextIfPresent().map(String::toLowerCase).map(a -> stream.filter(s -> s.toLowerCase().startsWith(a))).orElse(stream).collect(ImmutableList.toImmutableList());
     }
 

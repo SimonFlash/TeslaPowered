@@ -10,7 +10,7 @@ import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 
-@Plugin(id = "teslacore", name = "TeslaCore", version = "1.1.0", dependencies = @Dependency(id = "teslalibs"), description = "Conductor of all things Tesla", authors = "Simon_Flash")
+@Plugin(id = "teslacore", name = "TeslaCore", version = "1.1.2", dependencies = @Dependency(id = "teslalibs"), description = "Conductor of all things Tesla", authors = "Simon_Flash")
 public class TeslaCore extends Tesla {
 
     @Inject

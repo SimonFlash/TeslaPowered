@@ -32,5 +32,4 @@ public class DateParser extends StandardParser<LocalDate> {
         return complete(args, Stream.of(LocalDate.now().toString()));
     }
 
-
 }

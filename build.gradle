@@ -4,42 +4,41 @@ plugins {
 }
 
 group 'com.mcsimonflash.sponge.teslapowered'
-version '1.1.1'
+version '1.1.2'
 ext.spongeversion = '7.1.0-SNAPSHOT'
-version "s${spongeversion[0..2]}-v${version}"
 
-allprojects {
-    apply plugin: 'java'
+subprojects {
     apply plugin: 'org.spongepowered.plugin'
+    version = "s${spongeversion[0..2]}-v${this.version}"
     dependencies {
         compile "org.spongepowered:spongeapi:${spongeversion}"
     }
+}
 
-    version = rootProject.version
-
+project(':TeslaLibs') {
     task sourcesJar(type: Jar, dependsOn: classes) {
         from sourceSets.main.allSource
-        classifier = "sources"
+        classifier = 'sources'
     }
     artifacts.archives sourcesJar
 }
 
 dependencies {
-    compile project(":TeslaCore")
-    compile project(":TeslaLibs")
+    compile project(':TeslaCore')
+    compile project(':TeslaLibs')
 }
 
 shadowJar {
     dependencies {
-        include project(":TeslaCore")
-        include project(":TeslaLibs")
+        include project(':TeslaCore')
+        include project(':TeslaLibs')
     }
-    classifier = null // removes the '-all' ending
+    archiveName "${project.name}-s${spongeversion[0..2]}-v${version}.jar"
 }
 
 task copyJars(type: Copy) {
-    from([subprojects.jar, shadowJar])
+    from([subprojects.jar, project(':TeslaLibs').sourcesJar, shadowJar])
     into project.file("#releases/${version}")
 }
 
-build.dependsOn(shadowJar, copyJars)
+build.dependsOn(copyJars)

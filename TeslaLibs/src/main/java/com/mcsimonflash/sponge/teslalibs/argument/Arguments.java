@@ -30,8 +30,8 @@ public class Arguments {
             .put("undefined", Tristate.UNDEFINED).put("u", Tristate.UNDEFINED).put("1/2", Tristate.UNDEFINED)
             .build();
 
-    private static final ValueParser<String> STRING = new StringParser(false, ImmutableMap.of());
-    private static final ValueParser<String> REMAINING_STRINGS = new StringParser(true, ImmutableMap.of());
+    private static final StringParser STRING = string(false, ImmutableMap.of());
+    private static final StringParser REMAINING_STRINGS = string(true, ImmutableMap.of());
     private static final NumberParser<Integer> INTEGER = number(Integer::decode, ImmutableMap.of("invalid-format", "Expected <arg> to be an integer."));
     private static final NumberParser<Long> LONG = number(Long::decode, ImmutableMap.of("invalid-format", "Expected <arg> to be a long (integer)."));
     private static final NumberParser<Float> FLOAT = number(Float::valueOf, ImmutableMap.of("invalid-format", "Expected <arg> to be a float (decimal)."));
@@ -193,6 +193,15 @@ public class Arguments {
     }
 
     /**
+     * Creates a new {@link StringParser}. If remaining is true, all remaining
+     * arguments will be joined with spaces, else only the next argument is
+     * returned. There are no messages used.
+     */
+    public static StringParser string(boolean remaining, ImmutableMap<String, String> unused) {
+        return new StringParser(remaining, unused);
+    }
+
+    /**
      * Creates a new {@link NumberParser}. Available messages are:
      *
      *  invalid-number: If the function throws a {@link NumberFormatException}.
@@ -272,7 +281,7 @@ public class Arguments {
     }
 
     /**
-     * Creates a new {@link CommandParser}.
+     * Creates a new {@link CommandParser}. There are no messages used.
      */
     public static CommandParser command(ImmutableMap<String, String> messages) {
         return new CommandParser(messages);
@@ -309,7 +318,7 @@ public class Arguments {
 
     /**
      * Creates a new {@link FunctionParser} that converts the value returned by
-     * the delegate.
+     * the delegate. Available messages are:
      *
      *  exception: If an exception is thrown when applying the function
      */
@@ -334,7 +343,7 @@ public class Arguments {
     /**
      * Creates a new {@link SelectorParser} that accepts a selector for entities
      * of a given type. Entities that are not instances of the given class will
-     * be filtered out. The returned set may be empty.
+     * be filtered out. The returned set may be empty. Available messages are:
      *
      *  exception: If an exception is thrown when applying the function
      *  invalid-selector: If the selector could not be parsed

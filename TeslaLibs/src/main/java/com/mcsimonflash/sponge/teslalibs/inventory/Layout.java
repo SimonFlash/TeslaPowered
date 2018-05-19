@@ -112,10 +112,7 @@ public class Layout {
          * Sets the element to all of the indices in the given row.
          */
         public Builder row(Element element, int index) {
-            for (int i = columns * index; i < columns * (index + 1); i++) {
-                set(element, i);
-            }
-            return this;
+            return range(element, index * columns, index * (columns + 1));
         }
 
         /**
@@ -123,6 +120,17 @@ public class Layout {
          */
         public Builder column(Element element, int index) {
             for (int i = index; i < capacity; i += columns) {
+                set(element, i);
+            }
+            return this;
+        }
+
+        /**
+         * Sets the element to all indices within the given range. The range is
+         * closed-open, meaning the upper index is exclusive.
+         */
+        public Builder range(Element element, int lower, int upper) {
+            for (int i = lower; i < upper; i++) {
                 set(element, i);
             }
             return this;
@@ -139,14 +147,14 @@ public class Layout {
          * Sets the element to all indices along the border of the layout.
          */
         public Builder border(Element element) {
-            for (int i = 0; i <= columns; i++) {
-                set(element, i);
-                set(element, capacity - i);
+            if (rows < 3 || columns < 3) {
+                return range(element, 0, capacity);
             }
-            for (int i = 2; i < rows - 1; i++) {
-                int j = i * columns;
-                set(element, j - 1);
-                set(element, j);
+            for (int i = 0; i <= columns; i++) {
+                set(element, i, capacity - i - 1);
+            }
+            for (int i = 2 * columns; i < capacity - columns; i += columns) {
+                set(element, i, i - 1);
             }
             return this;
         }

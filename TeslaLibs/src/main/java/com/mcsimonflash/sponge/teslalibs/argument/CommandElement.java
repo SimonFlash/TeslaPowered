@@ -10,7 +10,7 @@ import org.spongepowered.api.text.Text;
 
 public class CommandElement<T> extends org.spongepowered.api.command.args.CommandElement implements ValueParser<T> {
 
-    protected final ValueParser<T> parser;
+    private final ValueParser<T> parser;
 
     public CommandElement(Text key, ValueParser<T> parser) {
         super(key);

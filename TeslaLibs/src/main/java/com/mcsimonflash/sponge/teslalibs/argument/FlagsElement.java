@@ -57,6 +57,8 @@ public class FlagsElement extends CommandElement {
                 CommandElement element = aliases.get(split[0].toLowerCase());
                 if (element == null || split.length == 1 && !args.hasNext()) {
                     return unused.stream().flatMap(Collection::stream).map(s -> "-" + s).filter(s -> s.toLowerCase().startsWith(split[0].toLowerCase())).collect(ImmutableList.toImmutableList());
+                } else if (split.length == 2) {
+                    args.insertArg(split[1]);
                 }
                 Object state = args.getState();
                 try {

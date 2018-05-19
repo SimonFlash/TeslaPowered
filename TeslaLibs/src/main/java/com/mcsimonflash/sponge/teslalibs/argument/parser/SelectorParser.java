@@ -58,7 +58,7 @@ public class SelectorParser<T> extends DelegateParser<T, Set<T>> {
      * selector or delegate parser were successful.
      */
     public OrSourceParser<Set<T>> orSource(Function<CommandSource, Set<T>> function) {
-        return Arguments.orSource(function, this, ImmutableMap.of());
+        return Arguments.orSource(function, this, ImmutableMap.of("exception", "Unable to parse selector or delegate and source is not of the proper type: <exception>"));
     }
 
 }
