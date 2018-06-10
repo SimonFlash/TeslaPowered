@@ -4,9 +4,11 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.mcsimonflash.sponge.teslacore.logger.LoggerService;
 import com.mcsimonflash.sponge.teslalibs.command.CommandService;
+import com.mcsimonflash.sponge.teslalibs.message.Message;
 import com.mcsimonflash.sponge.teslalibs.message.MessageService;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.text.Text;
 
 import java.net.URL;
 import java.nio.file.Path;
@@ -23,6 +25,7 @@ public abstract class Tesla {
     private final LoggerService logger;
     private final CommandService commands;
     private final MessageService messages;
+    private final Text prefix;
 
     public Tesla(PluginContainer container) {
         this.container = container;
@@ -30,6 +33,7 @@ public abstract class Tesla {
         logger = LoggerService.of(container);
         messages = TeslaUtils.getMessageService(this);
         commands = CommandService.of(container);
+        prefix = Message.toText("&8[&eTesla&6" + container.getName().substring(5) + "&8]&f: &7");
         REGISTRY.put(container.getId(), this);
     }
 
@@ -51,6 +55,10 @@ public abstract class Tesla {
 
     public CommandService getCommands() {
         return commands;
+    }
+
+    public Text getPrefix() {
+        return prefix;
     }
 
     public static ImmutableMap<String, Tesla> getRegistry() {

@@ -53,6 +53,10 @@ public class Message {
      * @return the deserialized message as a {@link Text}
      */
     public Text toText() {
+        return toText(message);
+    }
+
+    public static Text toText(String message) {
         return TextSerializers.FORMATTING_CODE.deserialize(message);
     }
 

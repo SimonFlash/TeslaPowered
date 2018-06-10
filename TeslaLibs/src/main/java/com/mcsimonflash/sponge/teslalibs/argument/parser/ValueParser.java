@@ -27,7 +27,12 @@ public interface ValueParser<T> {
      * given key.
      */
     default void parse(Text key, CommandSource src, CommandArgs args, CommandContext ctx) throws ArgumentParseException {
-        ctx.putArg(key, parseValue(src, args));
+        T value = parseValue(src, args);
+        if (value instanceof Iterable) {
+            ((Iterable<?>) value).forEach(v -> ctx.putArg(key, v));
+        } else {
+            ctx.putArg(key, value);
+        }
     }
 
     /**

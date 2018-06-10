@@ -3,6 +3,7 @@ package com.mcsimonflash.sponge.teslalibs.configuration;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
+@Deprecated //see ConfigurationException
 public class ConfigurationNodeException extends ObjectMappingException {
 
     private final ConfigurationNode node;

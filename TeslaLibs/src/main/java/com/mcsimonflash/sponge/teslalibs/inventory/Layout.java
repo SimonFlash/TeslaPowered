@@ -112,7 +112,7 @@ public class Layout {
          * Sets the element to all of the indices in the given row.
          */
         public Builder row(Element element, int index) {
-            return range(element, index * columns, index * (columns + 1));
+            return range(element, index * columns, (index + 1) * columns);
         }
 
         /**

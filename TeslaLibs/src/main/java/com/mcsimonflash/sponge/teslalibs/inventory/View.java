@@ -16,7 +16,7 @@ import org.spongepowered.api.scheduler.Task;
 import java.util.Map;
 import java.util.function.Consumer;
 
-public class View implements Animatable<Layout> {
+public class View implements Animatable<Layout>, Displayable {
 
     private final Inventory inventory;
     private final Map<Integer, Element> slots = Maps.newHashMap();
@@ -48,6 +48,7 @@ public class View implements Animatable<Layout> {
      * Opens this view for the given player. The opening of the inventory is
      * delayed by a tick to ensure any events are properly canceled.
      */
+    @Override
     public void open(Player player) {
         Task.builder().execute(t -> player.openInventory(inventory)).delayTicks(1).submit(container);
     }

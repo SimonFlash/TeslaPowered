@@ -1,37 +1,38 @@
 package com.mcsimonflash.sponge.teslalibs.command;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.*;
 import com.mcsimonflash.sponge.teslalibs.argument.Arguments;
 import com.mcsimonflash.sponge.teslalibs.message.Message;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.command.spec.CommandExecutor;
-import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.command.spec.*;
 import org.spongepowered.api.text.Text;
 
-import javax.annotation.Nullable;
-import java.util.Arrays;
-import java.util.Optional;
+import java.util.*;
 
 public abstract class Command implements CommandExecutor {
 
     private final CommandSpec spec;
-    private final ImmutableList<? extends Command> children;
+    private final ImmutableList<Command> children;
     private final ImmutableList<String> aliases;
     private final Optional<String> permission;
     private final Optional<Text> description;
     private final Text usage;
 
+    @Deprecated //v1.2.0
     protected Command(CommandService service, Settings settings) {
-        settings.children = settings.children != null ? settings.children : Optional.ofNullable(getClass().getAnnotation(Children.class)).map(Children::value).orElse(null);
-        settings.aliases = settings.aliases != null ? settings.aliases : Optional.ofNullable(getClass().getAnnotation(Aliases.class)).map(Aliases::value).orElse(null);
-        children = settings.children != null ? Arrays.stream(settings.children).map(service::getInstance).collect(ImmutableList.toImmutableList()) : ImmutableList.of();
-        aliases = settings.aliases != null ? ImmutableList.copyOf(settings.aliases) : ImmutableList.of();
-        permission = settings.permission != null ? Optional.of(settings.permission) : Optional.ofNullable(getClass().getAnnotation(Permission.class)).map(Permission::value);
-        description = settings.description != null ? Optional.of(settings.description) : Optional.ofNullable(getClass().getAnnotation(Description.class)).map(d -> Message.of(d.value()).toText());
+        this(settings.setService(service));
+    }
+
+    protected Command(Settings settings) {
+        settings.setAnnotations(getClass());
+        children = ImmutableList.copyOf(settings.children);
+        aliases = ImmutableList.copyOf(settings.aliases);
+        permission = Optional.ofNullable(settings.permission);
+        description = Optional.ofNullable(settings.description);
         CommandSpec.Builder builder = CommandSpec.builder().executor(this);
-        if (settings.arguments != null) {
-            builder.arguments(settings.arguments.length == 1 ? settings.arguments[0] : Arguments.sequence(settings.arguments));
+        if (!settings.elements.isEmpty()) {
+            builder.arguments(settings.elements.size() == 1 ? settings.elements.get(0) : Arguments.sequence(settings.elements.toArray(new CommandElement[0])));
         }
         children.forEach(c -> builder.child(c.getSpec(), c.getAliases()));
         permission.ifPresent(builder::permission);
@@ -85,47 +86,67 @@ public abstract class Command implements CommandExecutor {
     /**
      * @return a new Settings instance
      */
+    @Deprecated
     protected static Settings settings() {
-        return new Settings();
+        return new Settings(null);
     }
 
     protected static class Settings {
 
-        @Nullable CommandElement[] arguments;
-        @Nullable Class<? extends Command>[] children;
-        @Nullable String[] aliases;
-        @Nullable String permission;
-        @Nullable Text description;
-        @Nullable Text usage;
+        private CommandService service;
+        private final List<Command> children = Lists.newArrayList();
+        private final List<String> aliases = Lists.newArrayList();
+        private final List<CommandElement> elements = Lists.newArrayList();
+        private String permission;
+        private Text description;
+        private Text usage;
+
+        protected Settings(CommandService service) {
+            this.service = service;
+        }
+
+        /**
+         * Creates a new {@link Settings} instance with the given service.
+         */
+        public static Settings of(CommandService service) {
+            return new Settings(service);
+        }
 
         /**
          * Sets the arguments used for the representing {@link Command}. If
          * multiple {@link CommandElement}s are present, they are reduced to a
          * single element using {@link Arguments#sequence(CommandElement...)}.
          */
-        public Settings arguments(CommandElement... arguments) {
-            this.arguments = arguments;
+        public Settings elements(CommandElement... elements) {
+            Collections.addAll(this.elements, elements);
             return this;
         }
 
         /**
-         * Sets the child classes for the representing {@link Command}. The
-         * class instance is retrieved from the {@link CommandService} and added
-         * to the {@link CommandSpec} with their given aliases.
+         * Adds children to the representing {@link Command}.
+         */
+        public final Settings children(Command... children) {
+            Collections.addAll(this.children, children);
+            return this;
+        }
+
+        /**
+         * Adds children to the representing {@link Command}. The class instance
+         * is retrieved from the {@link CommandService} and added to the
+         * {@link CommandSpec} with their given aliases.
          */
         @SafeVarargs
         public final Settings children(Class<? extends Command>... children) {
-            this.children = children;
+            Collections.addAll(this.children, Arrays.stream(children).map(service::getInstance).toArray(Command[]::new));
             return this;
         }
 
         /**
-         * Sets the aliases used for the representing {@link Command}. Aliases
-         * should lowercase without spaces and in order of priority. The first
-         * alias that could be registered is considered the primary alias.
+         * Adds aliases the representing {@link Command}. Aliases should be
+         * lowercase without spaces and in order of priority.
          */
         public Settings aliases(String... aliases) {
-            this.aliases = aliases;
+            Collections.addAll(this.aliases, aliases);
             return this;
         }
 
@@ -155,6 +176,25 @@ public abstract class Command implements CommandExecutor {
         public Settings usage(Text usage) {
             this.usage = usage;
             return this;
+        }
+
+        @Deprecated private boolean deprecated = false;
+
+        @Deprecated
+        private Settings setService(CommandService service) {
+            this.service = service;
+            deprecated = true;
+            return this;
+        }
+
+        @Deprecated
+        private void setAnnotations(Class<? extends Command> clazz) {
+            if (deprecated) {
+                Optional.ofNullable(clazz.getAnnotation(Aliases.class)).ifPresent(a -> aliases(a.value()));
+                Optional.ofNullable(clazz.getAnnotation(Children.class)).ifPresent(c -> children(c.value()));
+                Optional.ofNullable(clazz.getAnnotation(Description.class)).ifPresent(d -> description(Message.toText(d.value())));
+                Optional.ofNullable(clazz.getAnnotation(Permission.class)).ifPresent(p -> permission(p.value()));
+            }
         }
 
     }

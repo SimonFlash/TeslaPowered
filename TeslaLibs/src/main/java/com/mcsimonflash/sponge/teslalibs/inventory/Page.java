@@ -17,7 +17,7 @@ import org.spongepowered.api.text.Text;
 
 import java.util.List;
 
-public class Page {
+public class Page implements Displayable {
 
     public static final Element FIRST = Element.builder().build();
     public static final Element LAST = Element.builder().build();
@@ -94,6 +94,14 @@ public class Page {
      */
     public void open(Player player, int page) {
         views.get((page > 1 ? Math.min(page, views.size()) - 1 : 0)).open(player);
+    }
+
+    /**
+     * Opens the first page for the player.
+     */
+    @Override
+    public void open(Player player) {
+        views.get(0).open(player);
     }
 
     /**

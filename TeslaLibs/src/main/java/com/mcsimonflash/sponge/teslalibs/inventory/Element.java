@@ -37,6 +37,20 @@ public class Element {
     }
 
     /**
+     * Creates a new {@link Element} with the given item and click action
+     */
+    public static Element of(ItemStackSnapshot item, Consumer<Action.Click> clickAction) {
+        return builder().item(item).onClick(clickAction).build();
+    }
+
+    /**
+     * Creates a new {@link Element} with the given item and no click.
+     */
+    public static Element of(ItemStackSnapshot item) {
+        return builder().item(item).build();
+    }
+
+    /**
      * @return the item
      */
     public ItemStackSnapshot getItem() {

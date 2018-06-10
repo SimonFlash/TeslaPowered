@@ -18,7 +18,13 @@ public class OptionalParser<T> extends DelegateParser<T, Optional<T>> {
 
     @Override
     public void parse(Text key, CommandSource src, CommandArgs args, CommandContext ctx) {
-        parseValue(src, args).ifPresent(v -> ctx.putArg(key, v));
+        parseValue(src, args).ifPresent(value -> {
+            if (value instanceof Iterable) {
+                ((Iterable<?>) value).forEach(v -> ctx.putArg(key, v));
+            } else {
+                ctx.putArg(key, value);
+            }
+        });
     }
 
     @Override
