@@ -6,6 +6,7 @@ import org.spongepowered.api.scheduler.Task;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+@Deprecated
 public class Animator<T extends Animatable<U>, U> {
 
     private T handler;
@@ -68,7 +69,9 @@ public class Animator<T extends Animatable<U>, U> {
         if (nextIndex < frames.size()) {
             runner = Task.builder().execute(task -> run(nextIndex, loop)).delay(frame.getLength(), TimeUnit.MILLISECONDS).submit(container);
         } else {
-            completion.run();
+            if (completion != null) {
+                completion.run();
+            }
             stop();
         }
     }

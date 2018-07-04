@@ -40,6 +40,7 @@ public class RegistryService<T> {
         return Collections.unmodifiableSet(registry.getDistinct());
     }
 
+    @Deprecated
     public boolean register(String id, T value, PluginContainer container) {
         return registry.register(id, value, container);
     }

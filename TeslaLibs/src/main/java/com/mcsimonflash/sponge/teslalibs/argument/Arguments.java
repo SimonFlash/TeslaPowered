@@ -4,6 +4,7 @@ import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.mcsimonflash.sponge.teslalibs.argument.parser.*;
+import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.entity.Entity;
@@ -303,6 +304,15 @@ public class Arguments {
      */
     public static DurationParser duration(ImmutableMap<String, String> messages) {
         return new DurationParser(messages);
+    }
+
+    /**
+     * Creates a new {@link CatalogTypeParser}. Available messages are:
+     *
+     *  no-type: If the argument is not the id of a registered catalog type.
+     */
+    public static <T extends CatalogType> CatalogTypeParser<T> catalogType(Class<T> type, ImmutableMap<String, String> messages) {
+        return new CatalogTypeParser<>(type, messages);
     }
 
     /**

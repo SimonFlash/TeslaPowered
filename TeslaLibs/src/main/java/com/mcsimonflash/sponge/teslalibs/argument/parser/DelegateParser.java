@@ -20,4 +20,9 @@ public abstract class DelegateParser<T, R> extends StandardParser<R> {
         return delegate.complete(src, args, ctx);
     }
 
+    @Override
+    public boolean isOptional() {
+        return delegate.isOptional();
+    }
+
 }

@@ -40,6 +40,11 @@ public class OptionalParser<T> extends DelegateParser<T, Optional<T>> {
         return Optional.empty();
     }
 
+    @Override
+    public boolean isOptional() {
+        return true;
+    }
+
     /**
      * Creates a new {@link FunctionParser} that returns the optional value if
      * present or else the given value.

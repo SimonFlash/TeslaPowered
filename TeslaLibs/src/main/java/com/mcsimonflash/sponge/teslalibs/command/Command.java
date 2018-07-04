@@ -112,6 +112,11 @@ public abstract class Command implements CommandExecutor {
             return new Settings(service);
         }
 
+        @Deprecated
+        public Settings arguments(CommandElement... elements) {
+            return elements(elements);
+        }
+
         /**
          * Sets the arguments used for the representing {@link Command}. If
          * multiple {@link CommandElement}s are present, they are reduced to a

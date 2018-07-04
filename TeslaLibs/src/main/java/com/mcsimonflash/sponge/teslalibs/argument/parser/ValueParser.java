@@ -43,6 +43,13 @@ public interface ValueParser<T> {
     }
 
     /**
+     * @return true if this parser can be parsed without consuming an argument.
+     */
+    default boolean isOptional() {
+        return false;
+    }
+
+    /**
      * Creates a new {@link FunctionParser} with the given mapper.
      *
      * @see Arguments#function(Function, ValueParser, ImmutableMap)

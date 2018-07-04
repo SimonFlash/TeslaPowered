@@ -1,5 +1,6 @@
 package com.mcsimonflash.sponge.teslalibs.animation;
 
+@Deprecated
 public class Frame<T> {
 
     private T frame;

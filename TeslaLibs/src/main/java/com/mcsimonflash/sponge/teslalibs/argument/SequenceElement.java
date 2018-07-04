@@ -7,12 +7,15 @@ import org.spongepowered.api.command.args.ArgumentParseException;
 import org.spongepowered.api.command.args.CommandArgs;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.text.Text;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class SequenceElement extends CommandElement {
+
+    private static final Class OPTIONAL = GenericArguments.optional(GenericArguments.seq()).getClass();
 
     private final ImmutableList<CommandElement> elements;
 
@@ -35,19 +38,24 @@ public class SequenceElement extends CommandElement {
             Object state = args.getState();
             try {
                 element.parse(src, args, ctx);
-                if (args.hasNext()) {
-                    if (args.getState().equals(state)) {
-                        completions.addAll(element.complete(src, args, ctx));
-                        args.setState(state);
-                    } else {
-                        completions.clear();
+                if (state.equals(args.getState())) {
+                    completions.addAll(element.complete(src, args, ctx));
+                    args.setState(state);
+                } else if (args.hasNext()) {
+                    completions.clear();
+                } else {
+                    args.setState(state);
+                    completions.addAll(element.complete(src, args, ctx));
+                    if (!element.getClass().equals(OPTIONAL) && !(element instanceof com.mcsimonflash.sponge.teslalibs.argument.CommandElement && ((com.mcsimonflash.sponge.teslalibs.argument.CommandElement) element).getParser().isOptional())) {
+                        break;
                     }
-                    continue;
+                    args.setState(state);
                 }
-            } catch (ArgumentParseException ignored) {}
-            args.setState(state);
-            completions.addAll(element.complete(src, args, ctx));
-            break;
+            } catch (ArgumentParseException ignored) {
+                args.setState(state);
+                completions.addAll(element.complete(src, args, ctx));
+                break;
+            }
         }
         return ImmutableList.copyOf(completions);
     }

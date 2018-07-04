@@ -1,5 +1,6 @@
 package com.mcsimonflash.sponge.teslalibs.animation;
 
+@Deprecated
 public interface Animatable<T> {
 
     /**

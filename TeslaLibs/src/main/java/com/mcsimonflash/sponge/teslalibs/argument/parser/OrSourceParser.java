@@ -31,4 +31,9 @@ public class OrSourceParser<T> extends DelegateParser<T, T> {
         }
     }
 
+    @Override
+    public boolean isOptional() {
+        return true;
+    }
+
 }
