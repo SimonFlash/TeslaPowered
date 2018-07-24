@@ -1,21 +1,20 @@
 package com.mcsimonflash.sponge.teslalibs.inventory;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
-import org.spongepowered.api.item.inventory.InventoryArchetypes;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.item.inventory.property.AbstractInventoryProperty;
-import org.spongepowered.api.item.inventory.property.InventoryCapacity;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class Page implements Displayable {
 
@@ -26,44 +25,42 @@ public class Page implements Displayable {
     public static final Element CURRENT = Element.builder().build();
 
     private final List<View> views = Lists.newArrayList();
-    private final InventoryArchetype archetype;
-    private final ImmutableList<InventoryProperty> properties;
+    private final View.Builder view;
     private final Layout layout;
     private final PluginContainer container;
 
     /**
-     * @see Page#of(InventoryArchetype, Layout, PluginContainer)
+     * Creates a new {@link Page} with a backing inventory defined by the given
+     * view builder and layout template.
      */
-    private Page(InventoryArchetype archetype, ImmutableList<InventoryProperty> properties, Layout layout, PluginContainer container) {
-        this.archetype = archetype;
-        this.properties = properties;
+    private Page(View.Builder view, Layout layout, PluginContainer container) {
+        this.view = view;
         this.layout = layout;
         this.container = container;
     }
 
     /**
-     * Creates a new {@link Page} using the given layout as the template and
+     * Creates a new {@link Page} using the given layout as the layout and
      * archetype for creating the backing {@link View}s.
      *
      * @see Page.Builder methods
      */
     public static Page of(InventoryArchetype archetype, Layout layout, PluginContainer container) {
-        return Page.builder().archetype(archetype).layout(layout).build(container);
+        return builder().archetype(archetype).layout(layout).build(container);
     }
 
     /**
      * Defines this page to contain the given elements. The number of pages is
      * expanded as need be to fill the size of the elements.
+     *
+     * @see Layout.Builder#page(Collection)
      */
     public Page define(List<Element> elements) {
         views.clear();
-        int capacity = archetype.getProperty(InventoryCapacity.class).map(AbstractInventoryProperty::getValue)
-                .orElse(layout.getDimension().getRows() * layout.getDimension().getColumns()) - layout.getElements().size();
+        int capacity = layout.getDimension().getRows() * layout.getDimension().getColumns() - layout.getElements().size();
         int pages = elements.isEmpty() ? 1 : (elements.size() - 1) / capacity + 1;
         for (int i = 1; i <= pages; i++) {
-            View.Builder builder = View.builder().archetype(archetype);
-            properties.forEach(builder::property);
-            views.add(builder.build(container).define(Layout.builder()
+            views.add(view.build(container).define(Layout.builder()
                     .from(layout)
                     .replace(FIRST, createElement("First Page", i, 1))
                     .replace(LAST, createElement("Last Page", i, pages))
@@ -98,6 +95,8 @@ public class Page implements Displayable {
 
     /**
      * Opens the first page for the player.
+     *
+     * @see View#open(Player)
      */
     @Override
     public void open(Player player) {
@@ -111,31 +110,45 @@ public class Page implements Displayable {
         return new Builder();
     }
 
-    public static class Builder {
+    public static class Builder implements Displayable.Builder {
 
-        private InventoryArchetype archetype = InventoryArchetypes.DOUBLE_CHEST;
-        private List<InventoryProperty> properties = Lists.newArrayList();
+        private View.Builder view = View.builder();
         private Layout layout;
 
         /**
-         * Sets the archetype used for the backing {@link View}s.
+         * Sets the archetype used for the backing {@link View}s. The dimension
+         * of the archetype is expected to match the dimension of the layout.
          */
+        @Override
         public Builder archetype(InventoryArchetype archetype) {
-            this.archetype = archetype;
+            view.archetype(archetype);
             return this;
         }
 
         /**
          * Adds a property used for the backing {@link View}s.
          */
+        @Override
         public Builder property(InventoryProperty property) {
-            properties.add(property);
+            view.property(property);
+            return this;
+        }
+
+        /**
+         * Sets the close action that is accepted when this page is closed. The
+         * {@link InteractInventoryEvent.Close} event is only fired when the
+         * inventory is closed completely, not when changing views.
+         */
+        @Override
+        public Builder onClose(Consumer<Action<InteractInventoryEvent.Close>> action) {
+            view.onClose(action);
             return this;
         }
 
         /**
          * Sets the layout used for the template of this view. It is expected
-         * that the layout contains empty slots.
+         * that the layout contains empty slots. The dimension of the layout is
+         * expected to match the dimension of the archetype.
          */
         public Builder layout(Layout layout) {
             this.layout = layout;
@@ -145,9 +158,10 @@ public class Page implements Displayable {
         /**
          * @return the created page
          */
+        @Override
         public Page build(PluginContainer container) {
             Preconditions.checkState(layout != null, "layout");
-            return new Page(archetype, ImmutableList.copyOf(properties), layout, container);
+            return new Page(view, layout, container);
         }
 
     }

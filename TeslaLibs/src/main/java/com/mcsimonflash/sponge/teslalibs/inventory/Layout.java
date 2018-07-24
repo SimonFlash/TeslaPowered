@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.spongepowered.api.item.inventory.property.InventoryDimension;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
@@ -195,6 +196,13 @@ public class Layout {
                 set(element, index++);
             }
             return this;
+        }
+
+        /**
+         * @see #page(Collection)
+         */
+        public Builder page(Element... elements) {
+            return page(Arrays.asList(elements));
         }
 
         /**

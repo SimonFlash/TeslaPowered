@@ -21,7 +21,7 @@ public class Element {
     }
 
     /**
-     * Creates a new {@link Element} with the given item and click action
+     * Creates a new {@link Element} with the given item and click action.
      *
      * @see Element.Builder methods
      */
@@ -30,21 +30,21 @@ public class Element {
     }
 
     /**
-     * Creates a new {@link Element} with the given item and no click.
+     * Creates a new {@link Element} with the given item and empty click action.
      */
     public static Element of(ItemStack item) {
         return builder().item(item).build();
     }
 
     /**
-     * Creates a new {@link Element} with the given item and click action
+     * Creates a new {@link Element} with the given item and click action.
      */
     public static Element of(ItemStackSnapshot item, Consumer<Action.Click> clickAction) {
         return builder().item(item).onClick(clickAction).build();
     }
 
     /**
-     * Creates a new {@link Element} with the given item and no click.
+     * Creates a new {@link Element} with the given item and empty click action.
      */
     public static Element of(ItemStackSnapshot item) {
         return builder().item(item).build();

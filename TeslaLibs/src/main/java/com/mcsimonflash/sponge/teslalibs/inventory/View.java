@@ -46,11 +46,12 @@ public class View implements Animatable<Layout>, Displayable {
 
     /**
      * Opens this view for the given player. The opening of the inventory is
-     * delayed by a tick to ensure any events are properly canceled.
+     * delayed to ensure any event phases are properly exited. As such, this
+     * method can be called safely during inventory events.
      */
     @Override
     public void open(Player player) {
-        Task.builder().execute(t -> player.openInventory(inventory)).delayTicks(1).submit(container);
+        Task.builder().execute(t -> player.openInventory(inventory)).submit(container);
     }
 
     /**
@@ -109,6 +110,7 @@ public class View implements Animatable<Layout>, Displayable {
      * Updates this view with the given layout frame.
      */
     @Override
+    @Deprecated
     public void nextFrame(Layout frame) {
         update(frame);
     }
@@ -120,7 +122,7 @@ public class View implements Animatable<Layout>, Displayable {
         return new Builder();
     }
 
-    public static class Builder {
+    public static class Builder implements Displayable.Builder {
 
         private static final Consumer<Action<InteractInventoryEvent.Close>> NONE = a -> {};
 
@@ -130,6 +132,7 @@ public class View implements Animatable<Layout>, Displayable {
         /**
          * Sets the archetype for the backing inventory.
          */
+        @Override
         public Builder archetype(InventoryArchetype archetype) {
             builder.of(archetype);
             return this;
@@ -138,14 +141,18 @@ public class View implements Animatable<Layout>, Displayable {
         /**
          * Adds a property to the backing inventory
          */
+        @Override
         public Builder property(InventoryProperty property) {
             builder.property(property);
             return this;
         }
 
         /**
-         * Sets the close action that is accepted when this view is closed.
+         * Sets the close action that is accepted when this view is closed. The
+         * {@link InteractInventoryEvent.Close} event is only fired when the
+         * inventory is closed completely, not when changing views.
          */
+        @Override
         public Builder onClose(Consumer<Action<InteractInventoryEvent.Close>> action) {
             closeAction = action;
             return this;
@@ -154,6 +161,7 @@ public class View implements Animatable<Layout>, Displayable {
         /**
          * @return the created view
          */
+        @Override
         public View build(PluginContainer container) {
             return new View(builder, closeAction, container);
         }

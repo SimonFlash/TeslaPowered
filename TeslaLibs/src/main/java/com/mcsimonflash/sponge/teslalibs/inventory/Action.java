@@ -16,14 +16,14 @@ public class Action<T extends InteractInventoryEvent> {
     }
 
     /**
-     * @return the event of the click
+     * @return the event of the inventory action
      */
     public T getEvent() {
         return event;
     }
 
     /**
-     * @return the player that caused this click
+     * @return the player involved in this action
      */
     public Player getPlayer() {
         return player;
