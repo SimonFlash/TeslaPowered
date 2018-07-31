@@ -105,7 +105,7 @@ public class AnimUtils {
      * recommended to use {@link AnimUtils#circle(float)} instead.
      */
     public static Vector3f circle(float radians, Vector3f axis) {
-        return Quaternionf.fromAngleRadAxis(radians, axis).rotate(axis.equals(Vector3f.UNIT_Y) ? Vector3f.UNIT_X : Vector3f.from(-axis.getZ(), 0F, axis.getX()).normalize());
+        return Quaternionf.fromAngleRadAxis(radians % TAU, axis).rotate(axis.equals(Vector3f.UNIT_Y) ? Vector3f.UNIT_X : Vector3f.from(-axis.getZ(), 0F, axis.getX()).normalize());
     }
 
     /**
