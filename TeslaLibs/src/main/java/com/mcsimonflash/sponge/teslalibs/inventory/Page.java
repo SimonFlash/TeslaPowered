@@ -9,12 +9,14 @@ import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.property.InventoryTitle;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class Page implements Displayable {
 
@@ -28,15 +30,23 @@ public class Page implements Displayable {
     private final View.Builder view;
     private final Layout layout;
     private final PluginContainer container;
+    private final Function<Integer, Text> titleSupplier;
+    private final CreateElement supplyElementFunction;
 
     /**
      * Creates a new {@link Page} with a backing inventory defined by the given
      * view builder and layout template.
      */
-    private Page(View.Builder view, Layout layout, PluginContainer container) {
+    private Page(View.Builder view,
+                 Layout layout,
+                 PluginContainer container,
+                 Function<Integer, Text> titleSupplier,
+                 CreateElement supplyElement) {
         this.view = view;
         this.layout = layout;
         this.container = container;
+        this.titleSupplier = titleSupplier;
+        this.supplyElementFunction = supplyElement;
     }
 
     /**
@@ -60,29 +70,19 @@ public class Page implements Displayable {
         int capacity = layout.getDimension().getRows() * layout.getDimension().getColumns() - layout.getElements().size();
         int pages = elements.isEmpty() ? 1 : (elements.size() - 1) / capacity + 1;
         for (int i = 1; i <= pages; i++) {
-            views.add(view.build(container).define(Layout.builder()
+            views.add(view.property(InventoryTitle.of(titleSupplier.apply(i)))
+                    .build(container)
+                    .define(Layout.builder()
                     .from(layout)
-                    .replace(FIRST, createElement("First Page", i, 1))
-                    .replace(LAST, createElement("Last Page", i, pages))
-                    .replace(NEXT, createElement("Next Page", i, i == pages ? i : i + 1))
-                    .replace(PREVIOUS, createElement("Previous Page", i, i == 1 ? i : i - 1))
-                    .replace(CURRENT, createElement("Current Page", i, i))
+                    .replace(FIRST, supplyElementFunction.createElement(this, FIRST, i, 1))
+                    .replace(LAST, supplyElementFunction.createElement(this, LAST, i, pages))
+                    .replace(NEXT, supplyElementFunction.createElement(this, NEXT, i, i == pages ? i : i + 1))
+                    .replace(PREVIOUS, supplyElementFunction.createElement(this, PREVIOUS, i, i == 1 ? i : i - 1))
+                    .replace(CURRENT, supplyElementFunction.createElement(this, CURRENT, i, i))
                     .page(elements.subList((i - 1) * capacity, i == pages ? elements.size() : i * capacity))
                     .build()));
         }
         return this;
-    }
-
-    /**
-     * Creates an element for a certain page number and target page.
-     */
-    private Element createElement(String name, int page, int target) {
-        ItemStack item = ItemStack.builder()
-                .itemType(page == target ? ItemTypes.MAP : ItemTypes.PAPER)
-                .add(Keys.DISPLAY_NAME, Text.of(name, " (", target, ")"))
-                .quantity(target)
-                .build();
-        return page == target ? Element.of(item) : Element.of(item, a -> open(a.getPlayer(), target));
     }
 
     /**
@@ -114,6 +114,29 @@ public class Page implements Displayable {
 
         private View.Builder view = View.builder();
         private Layout layout;
+        private Function<Integer, Text> titleSupplier = page -> Text.of("Page " + page);
+
+        private CreateElement supplyElement = (page, element, current, target) -> {
+            String name = "";
+            if (element == FIRST) {
+                name = "First Page";
+            } else if (element == LAST) {
+                name = "Last Page";
+            } else if (element == NEXT){
+                name = "Next Page";
+            } else if (element == PREVIOUS) {
+                name = "Previous Page";
+            } else if (element == CURRENT) {
+                name = "Current Page";
+            }
+
+            ItemStack item = ItemStack.builder()
+                    .itemType(current == target ? ItemTypes.MAP : ItemTypes.PAPER)
+                    .add(Keys.DISPLAY_NAME, Text.of(name, " (", target, ")"))
+                    .quantity(target)
+                    .build();
+            return current == target ? Element.of(item) : Element.of(item, a -> page.open(a.getPlayer(), target));
+        };
 
         /**
          * Sets the archetype used for the backing {@link View}s. The dimension
@@ -155,13 +178,23 @@ public class Page implements Displayable {
             return this;
         }
 
+        public Builder supplyTitle(Function<Integer, Text> titleSupplier) {
+            this.titleSupplier = titleSupplier;
+            return this;
+        }
+
+        public Builder supplyElement(CreateElement supplyFunction) {
+            this.supplyElement = supplyFunction;
+            return this;
+        }
+
         /**
          * @return the created page
          */
         @Override
         public Page build(PluginContainer container) {
             Preconditions.checkState(layout != null, "layout");
-            return new Page(view, layout, container);
+            return new Page(view, layout, container, titleSupplier, supplyElement);
         }
 
     }

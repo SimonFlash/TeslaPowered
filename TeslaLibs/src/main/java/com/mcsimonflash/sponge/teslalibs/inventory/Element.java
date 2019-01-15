@@ -4,6 +4,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class Element {
 
