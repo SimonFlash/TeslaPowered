@@ -29,6 +29,13 @@ public interface Displayable {
         Builder property(InventoryProperty property);
 
         /**
+         * Sets the action that is accepted when this view is opened. The
+         * {@link InteractInventoryEvent.Open} event is only fired when the
+         * inventory is closed completely, not when changing views.
+         */
+        Builder onOpen(Consumer<Action<InteractInventoryEvent.Open>> action);
+
+        /**
          * Sets the close action that is accepted when the inventory is closed.
          * The {@link InteractInventoryEvent.Close} event is only fired when the
          * inventory is closed completely, not when changing views.

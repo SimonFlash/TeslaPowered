@@ -18,9 +18,9 @@ public class Layout {
      * Creates a new {@link Layout} representing a map of elements to set
      * indices within an inventory.
      */
-    private Layout(ImmutableMap<Integer, Element> elements, InventoryDimension dimension) {
-        this.elements = elements;
-        this.dimension = dimension;
+    private Layout(Builder builder) {
+        elements = ImmutableMap.copyOf(builder.elements);
+        dimension = builder.dimension;
     }
 
     /**
@@ -260,7 +260,7 @@ public class Layout {
          * @return the created layout
          */
         public Layout build() {
-            return new Layout(ImmutableMap.copyOf(elements), dimension);
+            return new Layout(this);
         }
 
     }

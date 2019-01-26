@@ -1,6 +1,5 @@
 package com.mcsimonflash.sponge.teslalibs.inventory;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
@@ -33,9 +32,9 @@ public class Page implements Displayable {
      * Creates a new {@link Page} with a backing inventory defined by the given
      * view builder and layout template.
      */
-    private Page(View.Builder view, Layout layout, PluginContainer container) {
-        this.view = view;
-        this.layout = layout;
+    private Page(Builder builder, PluginContainer container) {
+        view = builder.view;
+        layout = builder.layout;
         this.container = container;
     }
 
@@ -47,6 +46,25 @@ public class Page implements Displayable {
      */
     public static Page of(InventoryArchetype archetype, Layout layout, PluginContainer container) {
         return builder().archetype(archetype).layout(layout).build(container);
+    }
+
+    /**
+     * Opens the first page for the player. This method can be called during
+     * inventory events.
+     *
+     * @see View#open(Player)
+     */
+    @Override
+    public void open(Player player) {
+        views.get(0).open(player);
+    }
+
+    /**
+     * Opens the given page for the player. Pages are indexed starting at 1. If
+     * the index is out of bounds, the closest valid page will be opened.
+     */
+    public void open(Player player, int page) {
+        views.get((page > 1 ? Math.min(page, views.size()) - 1 : 0)).open(player);
     }
 
     /**
@@ -86,24 +104,6 @@ public class Page implements Displayable {
     }
 
     /**
-     * Opens the given page for the player. Pages are indexed starting at 1. If
-     * the index is out of bounds, the closest valid page will be opened.
-     */
-    public void open(Player player, int page) {
-        views.get((page > 1 ? Math.min(page, views.size()) - 1 : 0)).open(player);
-    }
-
-    /**
-     * Opens the first page for the player.
-     *
-     * @see View#open(Player)
-     */
-    @Override
-    public void open(Player player) {
-        views.get(0).open(player);
-    }
-
-    /**
      * Creates a new builder for creating {@link Page}s.
      */
     public static Builder builder() {
@@ -135,7 +135,16 @@ public class Page implements Displayable {
         }
 
         /**
-         * Sets the close action that is accepted when this page is closed. The
+         * Sets the action that is accepted when this page is opened.
+         */
+        @Override
+        public Builder onOpen(Consumer<Action<InteractInventoryEvent.Open>> action) {
+            view.onOpen(action);
+            return this;
+        }
+
+        /**
+         * Sets the action that is accepted when this page is closed. The
          * {@link InteractInventoryEvent.Close} event is only fired when the
          * inventory is closed completely, not when changing views.
          */
@@ -160,8 +169,7 @@ public class Page implements Displayable {
          */
         @Override
         public Page build(PluginContainer container) {
-            Preconditions.checkState(layout != null, "layout");
-            return new Page(view, layout, container);
+            return new Page(this, container);
         }
 
     }

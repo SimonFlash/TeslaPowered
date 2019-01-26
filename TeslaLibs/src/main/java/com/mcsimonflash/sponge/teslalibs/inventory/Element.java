@@ -10,14 +10,14 @@ public class Element {
     public static final Element EMPTY = builder().build();
 
     private final ItemStackSnapshot item;
-    private final Consumer<Action.Click> clickAction;
+    private final Consumer<Action.Click> onClick;
 
     /**
      * @see Element#of(ItemStack, Consumer)
      */
-    private Element(ItemStackSnapshot item, Consumer<Action.Click> clickAction) {
-        this.item = item;
-        this.clickAction = clickAction;
+    private Element(Builder builder) {
+        item = builder.item;
+        onClick = builder.onClick;
     }
 
     /**
@@ -61,7 +61,7 @@ public class Element {
      * Processes this elements click action with the given {@link Action.Click}.
      */
     public void process(Action.Click action) {
-        clickAction.accept(action);
+        onClick.accept(action);
     }
 
     /**
@@ -76,7 +76,7 @@ public class Element {
         private static final Consumer<Action.Click> NONE = a -> {};
 
         private ItemStackSnapshot item = ItemStackSnapshot.NONE;
-        private Consumer<Action.Click> clickAction = NONE;
+        private Consumer<Action.Click> onClick = NONE;
 
         /**
          * Sets the item to be the given {@link ItemStackSnapshot}.
@@ -99,7 +99,7 @@ public class Element {
          * Sets the click action that is accepted when this element is clicked.
          */
         public Builder onClick(Consumer<Action.Click> action) {
-            clickAction = action;
+            onClick = action;
             return this;
         }
 
@@ -107,7 +107,7 @@ public class Element {
          * @return the created element
          */
         public Element build() {
-            return new Element(item, clickAction);
+            return new Element(this);
         }
 
     }
