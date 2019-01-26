@@ -1,7 +1,5 @@
 package com.mcsimonflash.sponge.teslalibs.message;
 
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.plugin.PluginContainer;
 
@@ -14,13 +12,15 @@ import java.util.ResourceBundle;
 
 public class MessageService {
 
-    private final LoadingCache<Locale, ResourceBundle> cache;
+    private final ClassLoader loader;
+    private final String name;
 
     /**
      * @see MessageService#of(ClassLoader, String)
      */
     private MessageService(ClassLoader loader, String name) {
-        cache = Caffeine.newBuilder().build(k -> ResourceBundle.getBundle(name, k, loader));
+        this.loader = loader;
+        this.name = name;
     }
 
     /**
@@ -54,15 +54,13 @@ public class MessageService {
     }
 
     /**
-     * Returns the {@link ResourceBundle} for the given {@link Locale}. This may
-     * throw multiple unchecked exceptions as documented in the methods linked
-     * below, most notably {@link java.util.MissingResourceException}.
+     * Returns the {@link ResourceBundle} for the given {@link Locale} or throws
+     * a {@link java.util.MissingResourceException} if no bundle could be found.
      *
-     * @see LoadingCache#get(Object)
-     * @see ResourceBundle#getBundle(String, Locale)
+     * @see ResourceBundle#getBundle(String, Locale, ClassLoader)
      */
     public ResourceBundle getBundle(Locale locale) {
-        return cache.get(locale);
+        return ResourceBundle.getBundle(name, locale, loader);
     }
 
     /**
@@ -81,7 +79,7 @@ public class MessageService {
      * Reloads the cache, invalidating any stored {@link ResourceBundle}s.
      */
     public void reload() {
-        cache.invalidateAll();
+        ResourceBundle.clearCache(loader);
     }
 
 }
