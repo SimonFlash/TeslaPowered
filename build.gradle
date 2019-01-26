@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'com.mcsimonflash.sponge.teslapowered'
-version '1.1.5'
+version '1.1.6'
 ext.spongeversion = '7.1.0-SNAPSHOT'
 
 subprojects {
