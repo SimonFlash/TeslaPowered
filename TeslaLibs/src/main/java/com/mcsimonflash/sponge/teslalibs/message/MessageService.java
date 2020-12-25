@@ -64,9 +64,6 @@ public class MessageService {
     /**
      * Returns the {@link ResourceBundle} for the given {@link Locale} or throws
      * a {@link java.util.MissingResourceException} if no bundle could be found.
-     * @throws IOException 
-     * @throws InstantiationException 
-     * @throws IllegalAccessException 
      *
      * @see ResourceBundle#getBundle(String, Locale, ClassLoader)
      */
