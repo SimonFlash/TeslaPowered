@@ -3,14 +3,24 @@ package com.mcsimonflash.sponge.teslalibs.message;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.plugin.PluginContainer;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Locale;
+import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
+import javax.annotation.Nullable;
 
 public class MessageService {
+
+    private static final Control CONTROL = new Control();
 
     private final ClassLoader loader;
     private final String name;
@@ -60,7 +70,7 @@ public class MessageService {
      * @see ResourceBundle#getBundle(String, Locale, ClassLoader)
      */
     public ResourceBundle getBundle(Locale locale) {
-        return ResourceBundle.getBundle(name, locale, loader);
+        return ResourceBundle.getBundle(name, locale, loader, CONTROL);
     }
 
     /**
@@ -80,6 +90,33 @@ public class MessageService {
      */
     public void reload() {
         ResourceBundle.clearCache(loader);
+    }
+
+    /**
+     * Custom {@link ResourceBundle.Control} implementation supporting UTF-8
+     * properties files.
+     */
+    private static final class Control extends ResourceBundle.Control {
+
+        @Override
+        public List<String> getFormats(String baseName) {
+            return ResourceBundle.Control.FORMAT_PROPERTIES;
+        }
+
+        @Override
+        @Nullable
+        public ResourceBundle newBundle(String baseName, Locale locale, String format, ClassLoader loader, boolean reload) throws IOException {
+            URL url = loader.getResource(toResourceName(toBundleName(baseName, locale), "properties"));
+            if (url != null) {
+                URLConnection connection = url.openConnection();
+                connection.setUseCaches(!reload);
+                try (InputStream stream = connection.getInputStream()) {
+                    return new PropertyResourceBundle(new InputStreamReader(stream, StandardCharsets.UTF_8));
+                }
+            }
+            return null;
+        }
+
     }
 
 }
