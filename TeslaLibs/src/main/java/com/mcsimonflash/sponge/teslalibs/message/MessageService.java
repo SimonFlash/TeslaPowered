@@ -19,6 +19,7 @@ import javax.annotation.Nullable;
 
 public class MessageService {
 
+    private static final Control CONTROL = new Control();
     private final ClassLoader loader;
     private final String name;
  
@@ -67,8 +68,6 @@ public class MessageService {
      *
      * @see ResourceBundle#getBundle(String, Locale, ClassLoader)
      */
-    
-    private static final Control CONTROL = new Control();
 
     public ResourceBundle getBundle(Locale locale)  {
     	  return ResourceBundle.getBundle(name, locale, loader, CONTROL);
