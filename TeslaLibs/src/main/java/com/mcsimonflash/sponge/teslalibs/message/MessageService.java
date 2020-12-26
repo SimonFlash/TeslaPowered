@@ -2,20 +2,20 @@ package com.mcsimonflash.sponge.teslalibs.message;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.plugin.PluginContainer;
-import org.apache.commons.io.FileUtils;
-
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Locale;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
+
+import javax.annotation.Nullable;
 
 public class MessageService {
 
@@ -69,18 +69,16 @@ public class MessageService {
      */
     
     //Using UTF8Control to workaround the issue with ResourceBundle from encoding the file under ISO-8859
+    private static final Control CONTROL = new Control();
 
     public ResourceBundle getBundle(Locale locale)  {
-    	  return ResourceBundle.getBundle(name, locale, loader, new UTF8Control());
+    	  return ResourceBundle.getBundle(name, locale, loader, CONTROL);
     }
 
     /**
      * Creates a new {@link Message} from the string retrieved from the locale's
      * {@link ResourceBundle} and this service's prefix and suffix. If the
      * bundle does not contain the given key, the key itself is used.
-     * @throws IOException 
-     * @throws InstantiationException 
-     * @throws IllegalAccessException 
      *
      * @see MessageService#getBundle(Locale)
      */
@@ -96,5 +94,28 @@ public class MessageService {
     public void reload() {
         ResourceBundle.clearCache(loader);
     }
+    
+    /**
+     * Custom {@link ResourceBundle.Control} implementation supporting UTF-8
+     * properties files.
+     */
+    private static final class Control extends ResourceBundle.Control {
+
+        @Override
+        @Nullable
+        public ResourceBundle newBundle(String baseName, Locale locale, String format, ClassLoader loader, boolean reload) throws IOException {
+            URL url = loader.getResource(toResourceName(toBundleName(baseName, locale), format));
+            if (url != null) {
+                URLConnection connection = url.openConnection();
+                connection.setUseCaches(!reload);
+                try (InputStream stream = connection.getInputStream()) {
+                    return new PropertyResourceBundle(new InputStreamReader(stream, StandardCharsets.UTF_8));
+                }
+            }
+            return null;
+        }
+
+    }
 
 }
+
