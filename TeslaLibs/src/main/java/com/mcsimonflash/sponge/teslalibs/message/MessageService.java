@@ -68,7 +68,6 @@ public class MessageService {
      * @see ResourceBundle#getBundle(String, Locale, ClassLoader)
      */
     
-    //Using UTF8Control to workaround the issue with ResourceBundle from encoding the file under ISO-8859
     private static final Control CONTROL = new Control();
 
     public ResourceBundle getBundle(Locale locale)  {
